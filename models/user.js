@@ -19,6 +19,16 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "studentId",
       });
     }
+
+    static addUser({ firstName, lastName, email, password, role }) {
+      return this.create({
+        firstName,
+        lastName,
+        email,
+        password,
+        role,
+      });
+    }
   }
   User.init(
     {
