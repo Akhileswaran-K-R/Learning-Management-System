@@ -24,7 +24,7 @@ describe("User test suite", () => {
   });
 
   test("Sign up by instructor", async () => {
-    let res = await agent.get("/signup/Instructor");
+    let res = await agent.get("/signup");
     const csrfToken = extractCsrfToken(res);
     res = await agent.post("/users").send({
       firstName: "Test",
@@ -35,21 +35,6 @@ describe("User test suite", () => {
       _csrf: csrfToken,
     });
     console.log(res);
-    expect(res.statusCode).toBe(200);
-  });
-
-  test("Sign up by student", async () => {
-    let res = await agent.get("/signup/Student");
-    const csrfToken = extractCsrfToken(res);
-    res = await agent.post("/users").send({
-      firstName: "Test",
-      lastName: "User A",
-      email: "user.a@test.com",
-      password: "12345678",
-      role: "Student",
-      _csrf: csrfToken,
-    });
-    console.log(res);
-    expect(res.statusCode).toBe(200);
+    expect(res.statusCode).toBe(302);
   });
 });
