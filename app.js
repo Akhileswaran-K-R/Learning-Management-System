@@ -41,6 +41,14 @@ app.get("/signup/:role", (request, response) => {
   });
 });
 
+app.get("/login/:role", (request, response) => {
+  response.render("login", {
+    title: "Login",
+    role: request.params.role,
+    csrfToken: request.csrfToken(),
+  });
+});
+
 app.post("/users", async (request, response) => {
   const hashedPwd = await bcrypt.hash(request.body.password, saltRounds);
   try {
