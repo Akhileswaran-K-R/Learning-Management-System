@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon -e js,ejs",
-    "prepare": "husky"
+    "pretest": "set NODE_ENV=test& npx sequelize-cli db:drop && set NODE_ENV=test& npx sequelize-cli db:create",
+    "test": "set NODE_ENV=test& jest --detectOpenHandles",
+    "prepare": "husky install"
   },
   "author": "Akhil <akhilarathi956@gmail.com>",
   "license": "ISC",
