@@ -23,4 +23,11 @@ app.get("/", (request, response) => {
   });
 });
 
+app.get("/signup/:role", (request, response) => {
+  response.render("signup", {
+    title: "Sign up",
+    role: request.params.role,
+  });
+});
+
 module.exports = app;
