@@ -21,7 +21,9 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     static getAllCourses() {
-      return this.findAll();
+      return this.findAll({
+        include: User,
+      });
     }
 
     static addCourse({ title, instructorId }) {

@@ -34,7 +34,6 @@ describe("User test suite", () => {
       role: "Instructor",
       _csrf: csrfToken,
     });
-    console.log(res);
     expect(res.statusCode).toBe(302);
   });
 });

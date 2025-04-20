@@ -17,6 +17,14 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "pageId",
       });
     }
+
+    static addPage({ title, content, chapterId }) {
+      return this.create({
+        title,
+        content,
+        chapterId,
+      });
+    }
   }
   Pages.init(
     {
