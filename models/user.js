@@ -29,6 +29,10 @@ module.exports = (sequelize, DataTypes) => {
         role,
       });
     }
+
+    static findInstructor(id) {
+      return this.findByPk(id);
+    }
   }
   User.init(
     {

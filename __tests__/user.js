@@ -23,7 +23,7 @@ describe("User test suite", () => {
     server.close();
   });
 
-  test("Sign up by instructor", async () => {
+  test("Sign up", async () => {
     let res = await agent.get("/signup");
     const csrfToken = extractCsrfToken(res);
     res = await agent.post("/users").send({

@@ -19,6 +19,21 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "courseId",
       });
     }
+
+    static getAllCourses() {
+      return this.findAll();
+    }
+
+    static addCourse({ title, instructorId }) {
+      return this.create({
+        title,
+        instructorId,
+      });
+    }
+
+    static findCourse(id) {
+      return this.findByPk(id);
+    }
   }
   Course.init(
     {

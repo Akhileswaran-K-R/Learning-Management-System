@@ -28,8 +28,8 @@ app.set("views", path.join(__dirname, "views"));
 
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser("shh! some secret string"));
-app.use(csrf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
+// app.use(cookieParser("shh! some secret string"));
+// app.use(csrf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
 
 app.use(
   session({
@@ -127,10 +127,6 @@ app.get("/login", (request, response) => {
   });
 });
 
-app.get("/Student", (request, response) => {});
-
-app.get("/Instructor", (request, response) => {});
-
 app.post("/users", async (request, response) => {
   const hashedPwd = await bcrypt.hash(request.body.password, saltRounds);
   try {
@@ -162,9 +158,97 @@ app.post(
     if (request.body.role === request.user.role) {
       return response.redirect(`/${request.user.role}`);
     } else {
-      return response.redirect(`/login?role=${request.body.role}`);
+      request.logout((err) => {
+        if (err) {
+          return next(err);
+        }
+        return response.redirect(`/login?role=${request.body.role}`);
+      });
     }
   },
 );
+
+app.get(
+  "/Instructor",
+  // requireInstructor,
+  async (request, response) => {
+    try {
+      const courses = await Course.getAllCourses();
+      return response.json(courses);
+    } catch (error) {
+      console.error(error);
+    }
+  },
+);
+
+app.get(
+  "/Instructor/courses",
+  // requireInstructor,
+  async (request, response) => {
+    try {
+      const instructor = await User.findInstructor(request.body.id);
+      const courses = await instructor.getCourses();
+      return response.json(courses);
+    } catch (error) {
+      console.error(error);
+    }
+  },
+);
+
+app.get(
+  "/Instructor/courses/new",
+  //requireInstructor,
+  async (request, response) => {},
+);
+
+app.post(
+  "/Instructor/courses/new",
+  //requireInstructor,
+  async (request, response) => {
+    try {
+      const newCourse = await Course.addCourse({
+        title: request.body.title,
+        instructorId: request.body.id,
+      });
+
+      return response.json(newCourse);
+    } catch (error) {
+      console.error(error);
+    }
+  },
+);
+
+app.get(
+  "/Instructor/courses/:id/chapters",
+  /*requireInstructor,*/ async (request, response) => {
+    try {
+      const course = await Course.findCourse(request.params.id);
+      const chapters = await course.getChapters();
+      return response.json(chapters);
+    } catch (error) {
+      console.error(error);
+    }
+  },
+);
+
+app.get(
+  "/Instructor/courses/:id/chapters/new",
+  async (request, response) => {},
+);
+
+app.post("/Instructor/courses/:id/chapters/new", async (request, response) => {
+  try {
+    const chapter = await Chapter.addChapter({
+      title: request.body.title,
+      description: request.body.description,
+      courseId: request.params.id,
+    });
+    return response.json(chapter);
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+app.get("/Student", requireStudent, (request, response) => {});
 
 module.exports = app;
