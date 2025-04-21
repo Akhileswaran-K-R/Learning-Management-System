@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       Chapter.belongsTo(models.Course, {
         foreignKey: "courseId",
+        onDelete: "CASCADE",
       });
       Chapter.hasMany(models.Pages, {
         foreignKey: "chapterId",

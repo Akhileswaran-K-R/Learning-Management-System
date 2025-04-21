@@ -11,10 +11,12 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       CompletedPages.belongsTo(models.User, {
         foreignKey: "studentId",
+        onDelete: "CASCADE",
       });
 
       CompletedPages.belongsTo(models.Pages, {
         foreignKey: "pageId",
+        onDelete: "CASCADE",
       });
     }
   }

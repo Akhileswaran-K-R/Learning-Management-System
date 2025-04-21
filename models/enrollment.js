@@ -11,10 +11,12 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       Enrollment.belongsTo(models.User, {
         foreignKey: "studentId",
+        onDelete: "CASCADE",
       });
 
       Enrollment.belongsTo(models.Course, {
         foreignKey: "courseId",
+        onDelete: "CASCADE",
       });
     }
   }

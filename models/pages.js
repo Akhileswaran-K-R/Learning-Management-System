@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       Pages.belongsTo(models.Chapter, {
         foreignKey: "chapterId",
+        onDelete: "CASCADE",
       });
 
       Pages.hasMany(models.CompletedPages, {
