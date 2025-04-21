@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="./css/styles.css" rel="stylesheet">
 
     <title><%= title %></title>
 
@@ -13,14 +14,15 @@
   <body class="bg-gray-100 font-sans p-6">
     <header class="flex justify-between items-center border-b pb-2 mb-4">
       <h1 class="text-2xl font-bold">Welcome <%= name %></h1>
-      <button class="bg-red-600 text-white px-4 py-1 rounded">Signout</button>
+      <button class="bg-red-600 text-white px-4 py-1 rounded"><a href="/signout">Signout</a></button>
     </header>
 
-    <section>
-      <% if (role === 'Instructor') { %>
-        <%- include('instructor.ejs') %>
-      <% } else { %>
-        <%- include('student.ejs') %>
-      <% } %>
+    <% if (role === 'Instructor') { %>
+      <%- include('instructor.ejs') %>
+      <%- include('courses.ejs', {courses}) %>
+    <% } else { %>
+      <%- include('student.ejs') %>
+      <%- include('courses.ejs', {courses: studentCourses}) %>
+    <% } %>
   </body>
 </html>

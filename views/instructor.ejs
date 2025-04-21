@@ -8,20 +8,3 @@
 </section>
 
 <hr class="mb-4"/>
-
-<section>
-  <h3 class="text-md font-semibold mb-3">Available Courses</h3>
-  <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-    <% for (let i = 0; i < courses.length; i++) { %>
-      <div class="bg-white p-4 shadow rounded">
-        <p class="font-bold text-lg mb-1"><%= courses[i].title %></p>
-        <p class="text-gray-600 text-sm mb-1"></p>
-        <p class="text-gray-500 text-sm mb-2">👥 </p>
-        <div class="flex space-x-2">
-          <button class="bg-cyan-600 text-white px-2 py-1 rounded text-sm">View course</button>
-          <button class="bg-green-500 text-white px-2 py-1 rounded text-sm">Enroll</button>
-        </div>
-      </div>
-    <% } %>
-  </div>
-</section>

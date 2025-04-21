@@ -1,5 +1,5 @@
 "use strict";
-const { Model } = require("sequelize");
+const { Model, Op } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Course extends Model {
     /**
@@ -20,9 +20,14 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
 
-    static getAllCourses() {
+    static getAllCourses(User, excludedId) {
       return this.findAll({
         include: User,
+        where: {
+          instructorId: {
+            [Op.ne]: excludedId,
+          },
+        },
       });
     }
 

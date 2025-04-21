@@ -30,6 +30,7 @@ app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser("shh! some secret string"));
 app.use(csrf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
+app.use(express.static(path.join(__dirname, "public")));
 
 app.use(
   session({
@@ -119,6 +120,15 @@ app.get("/signup", (request, response) => {
   });
 });
 
+app.get("/signout", (request, response, next) => {
+  request.logout((err) => {
+    if (err) {
+      return next(err);
+    }
+    return response.redirect("/");
+  });
+});
+
 app.get("/login", (request, response) => {
   response.render("login", {
     title: "Login",
@@ -173,9 +183,18 @@ app.get(
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     try {
-      const courses = await Course.getAllCourses();
+      const courses = await Course.getAllCourses(User, request.user.id);
       const user = await User.findByPk(request.user.id);
       const name = user.firstName + " " + user.lastName;
+
+      for (const course of courses) {
+        const count = await Enrollment.count({
+          where: {
+            courseId: course.id,
+          },
+        });
+        course.dataValues.count = count;
+      }
 
       if (request.accepts("html")) {
         response.render("home", {
