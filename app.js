@@ -152,7 +152,7 @@ app.post("/users", async (request, response) => {
       if (err) {
         throw err;
       }
-      return response.redirect(`/Home`);
+      return response.redirect(`/home`);
     });
   } catch (error) {
     console.error(error);
@@ -166,7 +166,7 @@ app.post(
   }),
   (request, response) => {
     if (request.body.role === request.user.role) {
-      return response.redirect(`/Home`);
+      return response.redirect(`/home`);
     } else {
       request.logout((err) => {
         if (err) {
@@ -179,11 +179,24 @@ app.post(
 );
 
 app.get(
-  "/Home",
+  "/home",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     try {
-      const courses = await Course.getAllCourses(User, request.user.id);
+      let courses;
+      if (request.user.role === "Instructor") {
+        courses = await Course.getAvailableInstructorCourses(
+          User,
+          request.user.id,
+        );
+      } else {
+        courses = await Course.getAvailableStudentCourses(
+          User,
+          Enrollment,
+          request.user.id,
+        );
+      }
+
       const user = await User.findByPk(request.user.id);
       const name = user.firstName + " " + user.lastName;
 
@@ -213,7 +226,7 @@ app.get(
 );
 
 app.get(
-  "/Instructor/courses",
+  "/courses",
   // requireInstructor,
   async (request, response) => {
     try {
@@ -227,13 +240,13 @@ app.get(
 );
 
 app.get(
-  "/Instructor/courses/new",
+  "/courses/new",
   //requireInstructor,
   async (request, response) => {},
 );
 
 app.post(
-  "/Instructor/courses/new",
+  "/courses/new",
   //requireInstructor,
   async (request, response) => {
     try {
@@ -250,10 +263,10 @@ app.post(
 );
 
 app.get(
-  "/Instructor/courses/course:courseId/chapters",
+  "/courses/:id/chapters",
   /*requireInstructor,*/ async (request, response) => {
     try {
-      const course = await Course.findCourse(request.params.courseId);
+      const course = await Course.findCourse(request.params.id);
       const chapters = await course.getChapters();
       return response.json(chapters);
     } catch (error) {
@@ -262,60 +275,45 @@ app.get(
   },
 );
 
-app.get(
-  "/Instructor/courses/:id/chapters/new",
-  async (request, response) => {},
-);
+app.get("/courses/:id/chapters/new", async (request, response) => {});
 
-app.post(
-  "/Instructor/courses/course:courseId/chapters/new",
-  async (request, response) => {
-    try {
-      const newChapter = await Chapter.addChapter({
-        title: request.body.title,
-        description: request.body.description,
-        courseId: request.params.courseId,
-      });
-      return response.json(newChapter);
-    } catch (error) {
-      console.error(error);
-    }
-  },
-);
+app.post("/courses/:id/chapters/new", async (request, response) => {
+  try {
+    const newChapter = await Chapter.addChapter({
+      title: request.body.title,
+      description: request.body.description,
+      courseId: request.params.id,
+    });
+    return response.json(newChapter);
+  } catch (error) {
+    console.error(error);
+  }
+});
 
-app.get(
-  "/Instructor/courses/course:courseId/chapters/chapter:chapterId/pages",
-  async (request, response) => {
-    try {
-      const chapter = await Chapter.findChapter(request.params.chapterId);
-      const pages = await chapter.getPages();
-      return response.json(pages);
-    } catch (error) {
-      console.log(error);
-    }
-  },
-);
+app.get("/chapters/:id/pages", async (request, response) => {
+  try {
+    const chapter = await Chapter.findChapter(request.params.id);
+    const pages = await chapter.getPages();
+    return response.json(pages);
+  } catch (error) {
+    console.log(error);
+  }
+});
 
-app.get(
-  "/Instructor/courses/course:courseId/chapters/chapter:chapterId/pages/new",
-  async (request, response) => {},
-);
+app.get("/chapters/:id/pages/new", async (request, response) => {});
 
-app.post(
-  "/Instructor/courses/course:courseId/chapters/chapter:chapterId/pages/new",
-  async (request, response) => {
-    try {
-      const newPage = await Pages.addPage({
-        title: request.body.title,
-        content: request.body.content,
-        chapterId: request.params.chapterId,
-      });
-      return response.json(newPage);
-    } catch (error) {
-      console.error(error);
-    }
-  },
-);
+app.post("/chapters/:id/pages/new", async (request, response) => {
+  try {
+    const newPage = await Pages.addPage({
+      title: request.body.title,
+      content: request.body.content,
+      chapterId: request.params.id,
+    });
+    return response.json(newPage);
+  } catch (error) {
+    console.error(error);
+  }
+});
 
 app.get("/Student", requireStudent, (request, response) => {});
 

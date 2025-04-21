@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
 
-    static getAllCourses(User, excludedId) {
+    static getAvailableInstructorCourses(User, excludedId) {
       return this.findAll({
         include: User,
         where: {
@@ -28,6 +28,26 @@ module.exports = (sequelize, DataTypes) => {
             [Op.ne]: excludedId,
           },
         },
+      });
+    }
+
+    static async getAvailableStudentCourses(User, Enrollment, targetStudentId) {
+      const enrolledCourses = await Enrollment.findAll({
+        where: {
+          studentId: targetStudentId,
+        },
+        attributes: ["courseId"],
+      });
+
+      const enrolledCourseIds = enrolledCourses.map((e) => e.courseId);
+
+      return this.findAll({
+        where: {
+          id: {
+            [Op.notIn]: enrolledCourseIds.length ? enrolledCourseIds : [0],
+          },
+        },
+        include: User,
       });
     }
 

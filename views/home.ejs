@@ -19,10 +19,10 @@
 
     <% if (role === 'Instructor') { %>
       <%- include('instructor.ejs') %>
-      <%- include('courses.ejs', {courses}) %>
     <% } else { %>
       <%- include('student.ejs') %>
-      <%- include('courses.ejs', {courses: studentCourses}) %>
     <% } %>
+
+    <%- include('courses.ejs') %>
   </body>
 </html>
