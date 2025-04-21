@@ -12,7 +12,9 @@
           <%= courses[i].dataValues.count %>
         </p>
         <div class="flex space-x-2">
-          <button class="bg-cyan-600 text-white px-2 py-1 rounded text-sm">View course</button>
+          <button class="bg-cyan-600 text-white px-2 py-1 rounded text-sm">
+            <a href="/courses/<%= courses[i].id %>/chapters">View course</a>
+          </button>
           <button class="bg-green-500 text-white px-2 py-1 rounded text-sm">Enroll</button>
         </div>
       </div>

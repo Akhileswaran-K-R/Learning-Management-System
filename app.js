@@ -225,50 +225,57 @@ app.get(
   },
 );
 
-app.get(
-  "/courses",
-  // requireInstructor,
-  async (request, response) => {
-    try {
-      const instructor = await User.findInstructor(request.body.id);
-      const courses = await instructor.getCourses();
-      return response.json(courses);
-    } catch (error) {
-      console.error(error);
-    }
-  },
-);
+app.get("/courses", requireInstructor, async (request, response) => {
+  try {
+    const instructor = await User.findInstructor(request.user.id);
+    const courses = await instructor.getCourses();
+    return response.redirect("");
+  } catch (error) {
+    console.error(error);
+  }
+});
 
-app.get(
-  "/courses/new",
-  //requireInstructor,
-  async (request, response) => {},
-);
+app.get("/courses/new", requireInstructor, async (request, response) => {
+  response.render("newCourse", {
+    title: "Create new Course",
+    csrfToken: request.csrfToken(),
+  });
+});
 
-app.post(
-  "/courses/new",
-  //requireInstructor,
-  async (request, response) => {
-    try {
-      const newCourse = await Course.addCourse({
-        title: request.body.title,
-        instructorId: request.body.id,
-      });
+app.post("/courses/new", requireInstructor, async (request, response) => {
+  try {
+    const newCourse = await Course.addCourse({
+      title: request.body.title,
+      instructorId: request.user.id,
+    });
 
-      return response.json(newCourse);
-    } catch (error) {
-      console.error(error);
-    }
-  },
-);
+    return response.redirect(`/courses/${newCourse.id}/chapters`);
+  } catch (error) {
+    console.error(error);
+  }
+});
 
 app.get(
   "/courses/:id/chapters",
-  /*requireInstructor,*/ async (request, response) => {
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
     try {
       const course = await Course.findCourse(request.params.id);
       const chapters = await course.getChapters();
-      return response.json(chapters);
+      const isEnrolled = await Enrollment.findOne({
+        where: {
+          studentId: request.user.id,
+          courseId: course.id,
+        },
+      });
+
+      response.render("chapter", {
+        title: "Chapter",
+        chapters,
+        course,
+        role: request.user.role,
+        isEnrolled,
+      });
     } catch (error) {
       console.error(error);
     }

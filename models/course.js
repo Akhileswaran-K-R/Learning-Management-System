@@ -40,7 +40,9 @@ module.exports = (sequelize, DataTypes) => {
         attributes: ["courseId"],
       });
 
-      const enrolledCourseIds = enrolledCourses.map((e) => e.courseId);
+      const enrolledCourseIds = enrolledCourses.map(
+        (enrolledCourse) => enrolledCourse.courseId,
+      );
 
       return this.findAll({
         where: {
