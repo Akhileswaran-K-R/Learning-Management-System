@@ -36,4 +36,13 @@ describe("User test suite", () => {
     });
     expect(res.statusCode).toBe(302);
   });
+
+  test("Sign out", async () => {
+    let res = await agent.get("/home");
+    expect(res.statusCode).toBe(200);
+    res = await agent.get("/signout");
+    expect(res.statusCode).toBe(302);
+    res = await agent.get("/home");
+    expect(res.statusCode).toBe(302);
+  });
 });
