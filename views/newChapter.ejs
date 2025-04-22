@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/css/styles.css" rel="stylesheet">
+
+    <title><%= title %></title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+
+  <body class="bg-white min-h-screen px-24 py-16 font-[Comic_Sans_MS] text-[1.5rem] leading-relaxed">
+    <div class="text-base text-gray-600 mb-4">
+      <a href="/" class="text-blue-600 underline hover:text-blue-800">Home</a> &gt; 
+      <a href="/courses/<%= course.id %>/chapters" class="text-blue-600 underline hover:text-blue-800"><%= course.title %></a> &gt;
+      Create a new chapter
+    </div>
+
+    <h1 class="text-[3rem] font-bold mb-12">Create Chapter</h1>
+
+    <form method="POST" class="space-y-10">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div>
+        <label for="title" class="block text-gray-700 mb-4">
+          What is the name of this chapter?
+        </label>
+        <input type="text" name="title" id="title" placeholder="Chapter name" class="mb-6 w-[600px] border border-black px-6 py-4 rounded-lg text-[1.5rem] focus:outline-none focus:ring-4 focus:ring-blue-400">
+
+        <label for="description" class="block text-gray-700 mb-4">
+          Description
+        </label>
+        <input type="text" name="description" id="description" placeholder="A brief description for the chapter" class="w-[600px] border border-black px-6 py-4 rounded-lg text-[1.5rem] focus:outline-none focus:ring-4 focus:ring-blue-400">
+      </div>
+
+      <button type="submit" class="bg-black text-white px-8 py-4 text-[1.5rem] rounded-lg hover:bg-gray-800">
+        Submit
+      </button>
+    </form>
+
+  </body>
+</html>

@@ -38,7 +38,7 @@ app.use(
     cookie: {
       maxAge: 24 * 60 * 60 * 1000, //24hrs
     },
-  }),
+  })
 );
 
 app.use(passport.initialize());
@@ -71,8 +71,8 @@ passport.use(
         .catch((error) => {
           return error;
         });
-    },
-  ),
+    }
+  )
 );
 
 passport.serializeUser((user, done) => {
@@ -106,10 +106,25 @@ function requireStudent(req, res, next) {
   }
 }
 
+async function requireAuthor(req, res, next) {
+  const id = req.params.id;
+  const course = await Course.findCourse(id);
+  const instructor = await course.getUser();
+  if (instructor.id === req.user.id) {
+    return next();
+  } else {
+    res.status(401).json({ message: "Unauthorized user." });
+  }
+}
+
 app.get("/", (request, response) => {
-  response.render("index", {
-    title: "Learning Management System",
-  });
+  if (request.user) {
+    return response.redirect("/home");
+  } else {
+    return response.render("index", {
+      title: "Learning Management System",
+    });
+  }
 });
 
 app.get("/signup", (request, response) => {
@@ -175,7 +190,7 @@ app.post(
         return response.redirect(`/login?role=${request.body.role}`);
       });
     }
-  },
+  }
 );
 
 app.get(
@@ -187,13 +202,13 @@ app.get(
       if (request.user.role === "Instructor") {
         courses = await Course.getAvailableInstructorCourses(
           User,
-          request.user.id,
+          request.user.id
         );
       } else {
         courses = await Course.getAvailableStudentCourses(
           User,
           Enrollment,
-          request.user.id,
+          request.user.id
         );
       }
 
@@ -206,7 +221,7 @@ app.get(
             courseId: course.id,
           },
         });
-        course.dataValues.count = count;
+        course.count = count;
       }
 
       if (request.accepts("html")) {
@@ -222,7 +237,7 @@ app.get(
     } catch (error) {
       console.error(error);
     }
-  },
+  }
 );
 
 app.get("/courses", requireInstructor, async (request, response) => {
@@ -261,6 +276,11 @@ app.get(
   async (request, response) => {
     try {
       const course = await Course.findCourse(request.params.id);
+      course.count = await Enrollment.count({
+        where: {
+          courseId: course.id,
+        },
+      });
       const chapters = await course.getChapters();
       const isEnrolled = await Enrollment.findOne({
         where: {
@@ -269,20 +289,36 @@ app.get(
         },
       });
 
+      const instructor = await course.getUser();
+      const isAuthor = request.user.id === instructor.id ? 1 : 0;
+
       response.render("chapter", {
         title: "Chapter",
         chapters,
         course,
         role: request.user.role,
+        instructor,
         isEnrolled,
+        isAuthor,
       });
     } catch (error) {
       console.error(error);
     }
-  },
+  }
 );
 
-app.get("/courses/:id/chapters/new", async (request, response) => {});
+app.get(
+  "/courses/:id/chapters/new",
+  requireInstructor,
+  requireAuthor,
+  async (request, response) => {
+    response.render("newChapter", {
+      title: "Create a new chapter",
+      course: await Course.findCourse(request.params.id),
+      csrfToken: request.csrfToken(),
+    });
+  }
+);
 
 app.post("/courses/:id/chapters/new", async (request, response) => {
   try {
