@@ -316,6 +316,7 @@ app.get(
         instructor,
         isEnrolled,
         isAuthor,
+        csrfToken: request.csrfToken(),
       });
     } catch (error) {
       console.error(error);
@@ -380,7 +381,7 @@ app.delete(
   requireAuthor,
   async (request, response) => {
     try {
-      await Course.delete(request.params.id);
+      await Course.remove(request.params.id);
       return response.json(true);
     } catch (error) {
       console.error(error);
@@ -395,8 +396,10 @@ app.delete(
   requireAuthor,
   async (request, response) => {
     try {
+      const chapter = Chapter.findChapter(request.params.id);
+      const course = chapter.getCourse();
       await Chapter.delete(request.params.id);
-      return response.json(true);
+      return response.redirect(`/courses/${course.id}/chapters`);
     } catch (error) {
       console.error(error);
       return response.status(422).json(false);

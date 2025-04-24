@@ -21,6 +21,7 @@ module.exports = {
           model: "Chapters",
           key: "id",
         },
+        onDelete: "CASCADE",
       },
       createdAt: {
         allowNull: false,

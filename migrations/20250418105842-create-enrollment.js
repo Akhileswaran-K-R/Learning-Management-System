@@ -15,6 +15,7 @@ module.exports = {
           model: "Users",
           key: "id",
         },
+        onDelete: "CASCADE",
       },
       courseId: {
         type: Sequelize.INTEGER,
@@ -22,6 +23,7 @@ module.exports = {
           model: "Courses",
           key: "id",
         },
+        onDelete: "CASCADE",
       },
       completed: {
         type: Sequelize.BOOLEAN,

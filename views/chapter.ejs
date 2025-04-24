@@ -4,11 +4,35 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content="<%= csrfToken %>" >
     <link href="/css/styles.css" rel="stylesheet">
 
     <title><%= title %></title>
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <script>
+      const token = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
+      console.log(token);
+
+      function deleteCourse(id){
+        fetch(`/courses/${id}/chapters`,{
+          method: "delete",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            "_csrf": token
+          })
+        }).then((res)=>{
+          if(res.ok){
+            window.location.href="/";
+          }
+        }).catch((error)=>{
+          console.error(error);
+        });
+      }
+    </script>
   </head>
 
   <body class="bg-gray-100 font-[Comic_Sans_MS] text-[1.2rem] px-24 py-16 min-h-screen leading-relaxed">
@@ -43,7 +67,7 @@
   
         <% if(isAuthor) { %>
           <button class="px-6 py-3 bg-purple-600 text-white font-bold text-lg rounded mt-8">
-            <a href="chapters/new">Create a new chapter</a>
+            <a href="/courses/<%= course.id %>/chapters/new">Create a new chapter</a>
           </button>
         <% } %>
       </div>
@@ -51,7 +75,7 @@
       <% if(isAuthor) { %>
         <div class="space-x-6 text-blue-600 font-semibold text-lg">
           <a href="/courses/1/edit" class="hover:underline">Edit</a>
-          <a href="/courses/1/delete" class="hover:underline">Delete</a>
+          <a href="#" onclick="deleteCourse(<%= course.id %>)" class="hover:underline">Delete</a>
         </div>
       <% } else if(!isEnrolled && role !== 'Instructor') { %>
         <div class="w-1/3 border rounded p-6 shadow-lg">
