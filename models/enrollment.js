@@ -19,6 +19,14 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
       });
     }
+
+    static getCourseEnrolledCount(id) {
+      return this.count({
+        where: {
+          courseId: id,
+        },
+      });
+    }
   }
   Enrollment.init(
     {

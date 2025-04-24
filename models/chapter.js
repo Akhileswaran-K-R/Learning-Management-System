@@ -29,6 +29,14 @@ module.exports = (sequelize, DataTypes) => {
     static findChapter(id) {
       return this.findByPk(id);
     }
+
+    static delete(id) {
+      return this.destroy({
+        where: {
+          id,
+        },
+      });
+    }
   }
   Chapter.init(
     {

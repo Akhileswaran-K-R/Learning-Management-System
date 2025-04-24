@@ -54,6 +54,28 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
 
+    static async getEnrolledCourses(User, Enrollment, targetStudentId) {
+      const enrolledCourses = await Enrollment.findAll({
+        where: {
+          studentId: targetStudentId,
+        },
+        attributes: ["courseId"],
+      });
+
+      const enrolledCourseIds = enrolledCourses.map(
+        (enrolledCourse) => enrolledCourse.courseId,
+      );
+
+      return this.findAll({
+        where: {
+          id: {
+            [Op.in]: enrolledCourseIds.length ? enrolledCourseIds : [0],
+          },
+        },
+        include: User,
+      });
+    }
+
     static addCourse({ title, instructorId }) {
       return this.create({
         title,
@@ -63,6 +85,14 @@ module.exports = (sequelize, DataTypes) => {
 
     static findCourse(id) {
       return this.findByPk(id);
+    }
+
+    static delete(id) {
+      return this.destroy({
+        where: {
+          id,
+        },
+      });
     }
   }
   Course.init(

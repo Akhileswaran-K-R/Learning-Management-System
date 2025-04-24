@@ -23,6 +23,6 @@
       <%- include('student.ejs') %>
     <% } %>
 
-    <%- include('availableCourses.ejs') %>
+    <%- include('courseList.ejs', {heading: "Available Courses", isEnrolled: false}) %>
   </body>
 </html>

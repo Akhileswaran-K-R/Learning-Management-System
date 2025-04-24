@@ -38,7 +38,7 @@ app.use(
     cookie: {
       maxAge: 24 * 60 * 60 * 1000, //24hrs
     },
-  })
+  }),
 );
 
 app.use(passport.initialize());
@@ -71,8 +71,8 @@ passport.use(
         .catch((error) => {
           return error;
         });
-    }
-  )
+    },
+  ),
 );
 
 passport.serializeUser((user, done) => {
@@ -190,7 +190,7 @@ app.post(
         return response.redirect(`/login?role=${request.body.role}`);
       });
     }
-  }
+  },
 );
 
 app.get(
@@ -202,13 +202,13 @@ app.get(
       if (request.user.role === "Instructor") {
         courses = await Course.getAvailableInstructorCourses(
           User,
-          request.user.id
+          request.user.id,
         );
       } else {
         courses = await Course.getAvailableStudentCourses(
           User,
           Enrollment,
-          request.user.id
+          request.user.id,
         );
       }
 
@@ -216,12 +216,7 @@ app.get(
       const name = user.firstName + " " + user.lastName;
 
       for (const course of courses) {
-        const count = await Enrollment.count({
-          where: {
-            courseId: course.id,
-          },
-        });
-        course.count = count;
+        course.count = await Enrollment.getCourseEnrolledCount(course.id);
       }
 
       if (request.accepts("html")) {
@@ -237,18 +232,43 @@ app.get(
     } catch (error) {
       console.error(error);
     }
-  }
+  },
 );
 
-app.get("/courses", requireInstructor, async (request, response) => {
-  try {
-    const instructor = await User.findInstructor(request.user.id);
-    const courses = await instructor.getCourses();
-    return response.redirect("");
-  } catch (error) {
-    console.error(error);
-  }
-});
+app.get(
+  "/courses",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    try {
+      const instructor = await User.findInstructor(request.user.id);
+
+      let courses;
+      if (request.user.role === "Instructor") {
+        courses = await instructor.getCourses({
+          include: User,
+        });
+      } else {
+        courses = await Course.getEnrolledCourses(
+          User,
+          Enrollment,
+          request.user.id,
+        );
+      }
+
+      for (const course of courses) {
+        course.count = await Enrollment.getCourseEnrolledCount(course.id);
+      }
+
+      return response.render("course", {
+        title: "My Courses",
+        courses,
+        role: request.user.role,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  },
+);
 
 app.get("/courses/new", requireInstructor, async (request, response) => {
   response.render("newCourse", {
@@ -276,11 +296,7 @@ app.get(
   async (request, response) => {
     try {
       const course = await Course.findCourse(request.params.id);
-      course.count = await Enrollment.count({
-        where: {
-          courseId: course.id,
-        },
-      });
+      course.count = await Enrollment.getCourseEnrolledCount(course.id);
       const chapters = await course.getChapters();
       const isEnrolled = await Enrollment.findOne({
         where: {
@@ -304,7 +320,7 @@ app.get(
     } catch (error) {
       console.error(error);
     }
-  }
+  },
 );
 
 app.get(
@@ -317,7 +333,7 @@ app.get(
       course: await Course.findCourse(request.params.id),
       csrfToken: request.csrfToken(),
     });
-  }
+  },
 );
 
 app.post("/courses/:id/chapters/new", async (request, response) => {
@@ -358,6 +374,34 @@ app.post("/chapters/:id/pages/new", async (request, response) => {
   }
 });
 
-app.get("/Student", requireStudent, (request, response) => {});
+app.delete(
+  "/courses/:id/chapters",
+  requireInstructor,
+  requireAuthor,
+  async (request, response) => {
+    try {
+      await Course.delete(request.params.id);
+      return response.json(true);
+    } catch (error) {
+      console.error(error);
+      return response.status(422).json(false);
+    }
+  },
+);
+
+app.delete(
+  "/chapters/:id/pages",
+  requireInstructor,
+  requireAuthor,
+  async (request, response) => {
+    try {
+      await Chapter.delete(request.params.id);
+      return response.json(true);
+    } catch (error) {
+      console.error(error);
+      return response.status(422).json(false);
+    }
+  },
+);
 
 module.exports = app;
