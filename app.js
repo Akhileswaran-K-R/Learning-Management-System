@@ -446,7 +446,7 @@ app.delete(
   requireAuthor,
   async (request, response) => {
     try {
-      await Course.remove(request.params.id);
+      await Course.deleteCourse(request.params.id);
       return response.json(true);
     } catch (error) {
       console.error(error);
@@ -461,7 +461,22 @@ app.delete(
   requireAuthor,
   async (request, response) => {
     try {
-      await Chapter.delete(request.params.id);
+      await Chapter.deleteChapter(request.params.id);
+      return response.json(true);
+    } catch (error) {
+      console.error(error);
+      return response.status(422).json(false);
+    }
+  },
+);
+
+app.delete(
+  "pages/:id",
+  requireInstructor,
+  requireAuthor,
+  async (request, response) => {
+    try {
+      await Pages.deletePage(request.params.id);
       return response.json(true);
     } catch (error) {
       console.error(error);

@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
       return this.findByPk(id);
     }
 
-    static delete(id) {
+    static deleteChapter(id) {
       return this.destroy({
         where: {
           id,

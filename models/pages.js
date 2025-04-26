@@ -30,6 +30,14 @@ module.exports = (sequelize, DataTypes) => {
     static findPage(id) {
       return this.findByPk(id);
     }
+
+    static deletePage(id) {
+      return this.destroy({
+        where: {
+          id,
+        },
+      });
+    }
   }
   Pages.init(
     {
