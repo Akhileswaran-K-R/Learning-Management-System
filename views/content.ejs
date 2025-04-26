@@ -4,11 +4,36 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content="<%= csrfToken %>" >
+    <meta name="chapterId" content="<%= chapter.id %>" >
     <link href="/css/styles.css" rel="stylesheet">
 
     <title><%= title %></title>
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <script>
+      const token = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
+      const chapterId = document.querySelector('meta[name="chapterId"]').getAttribute("content");
+
+      function deletePage(id){
+        fetch(`/pages/${id}`,{
+          method: "delete",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            "_csrf": token
+          })
+        }).then((res)=>{
+          if(res.ok){
+            window.location.href=`/chapters/${chapterId}/pages`;
+          }
+        }).catch((error)=>{
+          console.error(error);
+        });
+      }
+    </script>
   </head>
 
 
@@ -23,7 +48,15 @@
 
     <div class="p-12 max-w-5xl mx-auto">
 
-      <h1 class="text-4xl font-bold mb-8"><%= page.title %></h1>
+      <div class="flex justify-between items-center mb-8">
+        <h1 class="text-4xl font-bold"><%= page.title %></h1>
+        <% if(isAuthor) { %>
+          <div class="space-x-6 text-blue-600 font-semibold text-lg">
+            <a href="/courses/1/edit" class="hover:underline">Edit</a>
+            <a href="#" onclick="deletePage(<%= page.id %>)" class="hover:underline">Delete</a>
+          </div>
+        <% } %>
+      </div>
 
       <div class="space-y-6 text-lg leading-relaxed">
         <% page.content.split('\n').forEach(paragraph => { %>

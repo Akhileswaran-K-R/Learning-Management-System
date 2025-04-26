@@ -108,18 +108,19 @@ function requireStudent(req, res, next) {
 
 async function requireAuthor(req, res, next) {
   const id = req.params.id;
-  let course = await Course.findCourse(id);
-  let chapter, page;
+  let page = await Pages.findPage(id);
+  let chapter, course;
 
-  if (!course) {
+  if (page) {
+    chapter = await page.getChapter();
+  } else {
     chapter = await Chapter.findChapter(id);
-    course = await chapter.getCourse();
   }
 
-  if (!course && !chapter) {
-    page = await Pages.findPage(id);
-    chapter = await page.getChapter();
+  if (chapter) {
     course = await chapter.getCourse();
+  } else {
+    course = await Course.findCourse(id);
   }
 
   const instructor = await course.getUser();
@@ -426,19 +427,25 @@ app.post(
   },
 );
 
-app.get("/pages/:id", async (request, response) => {
-  const page = await Pages.findPage(request.params.id);
-  const chapter = await page.getChapter();
-  const course = await chapter.getCourse();
+app.get(
+  "/pages/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const page = await Pages.findPage(request.params.id);
+    const chapter = await page.getChapter();
+    const course = await chapter.getCourse();
+    const isAuthor = request.user.id === (await course.getUser()).id ? 1 : 0;
 
-  response.render("content", {
-    title: "Content",
-    page,
-    chapter,
-    course,
-    csrfToken: request.csrfToken(),
-  });
-});
+    response.render("content", {
+      title: "Content",
+      page,
+      chapter,
+      course,
+      isAuthor,
+      csrfToken: request.csrfToken(),
+    });
+  },
+);
 
 app.delete(
   "/courses/:id/chapters",
@@ -471,7 +478,7 @@ app.delete(
 );
 
 app.delete(
-  "pages/:id",
+  "/pages/:id",
   requireInstructor,
   requireAuthor,
   async (request, response) => {
