@@ -32,6 +32,7 @@
         });
       }
     </script>
+    <script src="/js/scripts.js"></script>
   </head>
 
   <body class="bg-gray-100 font-[Comic_Sans_MS] text-[1.2rem] px-24 py-16 min-h-screen leading-relaxed">
@@ -88,7 +89,7 @@
             </svg>
             <span><%= course.count %></span>
           </div>
-          <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded w-full font-semibold">
+          <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded w-full font-semibold" onclick="enroll(<%= course.id %>)">
             Enroll
           </button>
         </div>

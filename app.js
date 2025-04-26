@@ -108,7 +108,7 @@ function requireStudent(req, res, next) {
 
 async function requireAuthor(req, res, next) {
   const id = req.params.id;
-  let page = await Pages.findPage(id);
+  const page = await Pages.findPage(id);
   let chapter, course;
 
   if (page) {
@@ -125,6 +125,35 @@ async function requireAuthor(req, res, next) {
 
   const instructor = await course.getUser();
   if (instructor.id === req.user.id) {
+    return next();
+  } else {
+    res.status(401).json({ message: "Unauthorized user." });
+  }
+}
+
+async function requireEnrolled(req, res, next) {
+  if (req.user.role === "Instructor") {
+    return next();
+  }
+
+  const id = req.params.id;
+  const page = await Pages.findPage(id);
+  let chapter, course;
+
+  if (page) {
+    chapter = await page.getChapter();
+  } else {
+    chapter = await Chapter.findChapter(id);
+  }
+
+  if (chapter) {
+    course = await chapter.getCourse();
+  } else {
+    course = await Course.findCourse(id);
+  }
+
+  const isEnrolled = await Enrollment.checkEnrollment(req.user.id, course.id);
+  if (isEnrolled) {
     return next();
   } else {
     res.status(401).json({ message: "Unauthorized user." });
@@ -239,6 +268,7 @@ app.get(
           name,
           role: request.user.role,
           courses,
+          csrfToken: request.csrfToken(),
         });
       } else {
         response.json(courses);
@@ -277,6 +307,7 @@ app.get(
         title: "My Courses",
         courses,
         role: request.user.role,
+        csrfToken: request.csrfToken(),
       });
     } catch (error) {
       console.error(error);
@@ -312,12 +343,10 @@ app.get(
       const course = await Course.findCourse(request.params.id);
       course.count = await Enrollment.getCourseEnrolledCount(course.id);
       const chapters = await course.getChapters();
-      const isEnrolled = await Enrollment.findOne({
-        where: {
-          studentId: request.user.id,
-          courseId: course.id,
-        },
-      });
+      const isEnrolled = await Enrollment.checkEnrollment(
+        request.user.id,
+        course.id,
+      );
 
       const instructor = await course.getUser();
       const isAuthor = request.user.id === instructor.id ? 1 : 0;
@@ -337,6 +366,16 @@ app.get(
     }
   },
 );
+
+app.post("/courses/:id/enroll", async (request, response) => {
+  try {
+    await Enrollment.enroll(request.user.id, request.params.id);
+    return response.json(true);
+  } catch (error) {
+    console.error(error);
+    return response.status(422).json(false);
+  }
+});
 
 app.get(
   "/courses/:id/chapters/new",
@@ -372,6 +411,7 @@ app.post(
 app.get(
   "/chapters/:id/pages",
   connectEnsureLogin.ensureLoggedIn(),
+  requireEnrolled,
   async (request, response) => {
     try {
       const chapter = await Chapter.findChapter(request.params.id);
@@ -430,6 +470,7 @@ app.post(
 app.get(
   "/pages/:id",
   connectEnsureLogin.ensureLoggedIn(),
+  requireEnrolled,
   async (request, response) => {
     const page = await Pages.findPage(request.params.id);
     const chapter = await page.getChapter();

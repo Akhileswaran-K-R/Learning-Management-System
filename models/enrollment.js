@@ -20,10 +20,27 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
 
+    static enroll(studentId, courseId) {
+      return this.create({
+        studentId,
+        courseId,
+        progess: 0,
+      });
+    }
+
     static getCourseEnrolledCount(id) {
       return this.count({
         where: {
           courseId: id,
+        },
+      });
+    }
+
+    static checkEnrollment(studentId, courseId) {
+      return this.findOne({
+        where: {
+          studentId,
+          courseId,
         },
       });
     }

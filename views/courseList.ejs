@@ -17,7 +17,7 @@
           </button>
 
           <% if(role ===  "Student" && !isEnrolled) { %>
-            <button class="bg-green-500 text-white px-2 py-1 rounded text-sm">Enroll</button>
+            <button class="bg-green-500 text-white px-2 py-1 rounded text-sm" onclick="enroll(<%= courses[i].id %>)">Enroll</button>
           <% } else if(role !== 'Instructor') { %>
             <button class="bg-green-500 text-white px-2 py-1 rounded text-sm">Unenroll</button>
           <% } %>
