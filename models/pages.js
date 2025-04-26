@@ -26,6 +26,10 @@ module.exports = (sequelize, DataTypes) => {
         chapterId,
       });
     }
+
+    static findPage(id) {
+      return this.findByPk(id);
+    }
   }
   Pages.init(
     {

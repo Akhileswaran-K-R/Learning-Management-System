@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/css/styles.css" rel="stylesheet">
+
+    <title><%= title %></title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+
+
+  <body class="bg-white min-h-screen font-[Comic_Sans_MS]">
+
+    <div class="text-base text-gray-600 mb-4 px-10 pt-10">
+      <a href="/" class="text-blue-600 underline hover:text-blue-800">Home</a> &gt; 
+      <a href="/courses/<%= course.id %>/chapters" class="text-blue-600 underline hover:text-blue-800"><%= course.title %></a> &gt;
+      <a href="/chapters/<%= chapter.id %>/pages" class="text-blue-600 underline hover:text-blue-800"><%= chapter.title %></a> &gt;
+      <%= page.title %>
+    </div>
+
+    <div class="p-12 max-w-5xl mx-auto">
+
+      <h1 class="text-4xl font-bold mb-8"><%= page.title %></h1>
+
+      <div class="space-y-6 text-lg leading-relaxed">
+        <% page.content.split('\n').forEach(paragraph => { %>
+          <p><%= paragraph %></p>
+        <% }) %>
+      </div>
+
+      <div class="flex justify-between items-center mt-16">
+        <button class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-3 rounded-md">
+          Mark as complete
+        </button>
+        <button class="bg-green-500 hover:bg-green-600 text-white font-semibold px-8 py-3 rounded-md flex items-center gap-2">
+          Next 
+          <span>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+              <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm4.28 10.28a.75.75 0 0 0 0-1.06l-3-3a.75.75 0 1 0-1.06 1.06l1.72 1.72H8.25a.75.75 0 0 0 0 1.5h5.69l-1.72 1.72a.75.75 0 1 0 1.06 1.06l3-3Z" clip-rule="evenodd" />
+            </svg>              
+          </span>
+        </button>
+      </div>
+
+    </div>
+
+  </body>
+</html>

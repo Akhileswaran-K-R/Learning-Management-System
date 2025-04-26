@@ -15,10 +15,9 @@
     <script>
       const token = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
       const courseId = document.querySelector('meta[name="courseId"]').getAttribute("content");
-      console.log(courseId);
 
       function deleteChapter(id){
-        fetch(`/${courseId}/chapters/${id}/pages`,{
+        fetch(`/chapters/${id}/pages`,{
           method: "delete",
           headers: {
             "Content-Type": "application/json"
@@ -64,9 +63,11 @@
       <% } else { %>
         <div class="space-y-3">
           <% pages.forEach((page) => { %>
-            <div class="flex justify-between items-center border px-4 py-2 rounded shadow w-90 ">
-              <span><%= page.title %></span>
-            </div>
+            <a href = "/pages/<%= page.id %>" class="block">
+              <div class="flex justify-between items-center border px-4 py-2 rounded shadow w-90 ">
+                <span><%= page.title %></span>
+              </div>
+            </a>
           <% }) %>
         </div>
       <% } %>

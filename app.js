@@ -108,7 +108,20 @@ function requireStudent(req, res, next) {
 
 async function requireAuthor(req, res, next) {
   const id = req.params.id;
-  const course = await Course.findCourse(id);
+  let course = await Course.findCourse(id);
+  let chapter, page;
+
+  if (!course) {
+    chapter = await Chapter.findChapter(id);
+    course = await chapter.getCourse();
+  }
+
+  if (!course && !chapter) {
+    page = await Pages.findPage(id);
+    chapter = await page.getChapter();
+    course = await chapter.getCourse();
+  }
+
   const instructor = await course.getUser();
   if (instructor.id === req.user.id) {
     return next();
@@ -379,19 +392,52 @@ app.get(
   },
 );
 
-app.get("/chapters/:id/pages/new", async (request, response) => {});
-
-app.post("/chapters/:id/pages/new", async (request, response) => {
-  try {
-    const newPage = await Pages.addPage({
-      title: request.body.title,
-      content: request.body.content,
-      chapterId: request.params.id,
+app.get(
+  "/chapters/:id/pages/new",
+  requireInstructor,
+  requireAuthor,
+  async (request, response) => {
+    const chapter = await Chapter.findChapter(request.params.id);
+    const course = await chapter.getCourse();
+    response.render("newPage", {
+      title: "New Page",
+      course,
+      chapter,
+      csrfToken: request.csrfToken(),
     });
-    return response.json(newPage);
-  } catch (error) {
-    console.error(error);
-  }
+  },
+);
+
+app.post(
+  "/chapters/:id/pages/new",
+  requireInstructor,
+  requireAuthor,
+  async (request, response) => {
+    try {
+      const newPage = await Pages.addPage({
+        title: request.body.title,
+        content: request.body.content,
+        chapterId: request.params.id,
+      });
+      return response.redirect(`/pages/${newPage.id}`);
+    } catch (error) {
+      console.error(error);
+    }
+  },
+);
+
+app.get("/pages/:id", async (request, response) => {
+  const page = await Pages.findPage(request.params.id);
+  const chapter = await page.getChapter();
+  const course = await chapter.getCourse();
+
+  response.render("content", {
+    title: "Content",
+    page,
+    chapter,
+    course,
+    csrfToken: request.csrfToken(),
+  });
 });
 
 app.delete(
@@ -410,12 +456,12 @@ app.delete(
 );
 
 app.delete(
-  "/:id/chapters/:chapterid/pages",
+  "/chapters/:id/pages",
   requireInstructor,
   requireAuthor,
   async (request, response) => {
     try {
-      await Chapter.delete(request.params.chapterid);
+      await Chapter.delete(request.params.id);
       return response.json(true);
     } catch (error) {
       console.error(error);
