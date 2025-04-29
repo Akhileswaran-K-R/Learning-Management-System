@@ -22,3 +22,23 @@ function enroll(id) {
       console.error(error);
     });
 }
+
+function unenroll(id) {
+  fetch(`/courses/${id}/unenroll`, {
+    method: "delete",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      _csrf: token,
+    }),
+  })
+    .then((res) => {
+      if (res.ok) {
+        window.location.reload();
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}

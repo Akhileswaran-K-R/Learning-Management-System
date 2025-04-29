@@ -37,14 +37,8 @@
   </head>
 
 
-  <body class="bg-white min-h-screen font-[Comic_Sans_MS]">
-
-    <div class="text-base text-gray-600 mb-4 px-10 pt-10">
-      <a href="/" class="text-blue-600 underline hover:text-blue-800">Home</a> &gt; 
-      <a href="/courses/<%= course.id %>/chapters" class="text-blue-600 underline hover:text-blue-800"><%= course.title %></a> &gt;
-      <a href="/chapters/<%= chapter.id %>/pages" class="text-blue-600 underline hover:text-blue-800"><%= chapter.title %></a> &gt;
-      <%= page.title %>
-    </div>
+  <body class="bg-white min-h-screen font-[Comic_Sans_MS] px-24 py-16 leading-relaxed">
+    <%- include('breadcrumbs.ejs',{path: [`/courses/${course.id}/chapters`,course.title,`/chapters/${chapter.id}/pages`,chapter.title,page.title]}) %>
 
     <div class="p-12 max-w-5xl mx-auto">
 

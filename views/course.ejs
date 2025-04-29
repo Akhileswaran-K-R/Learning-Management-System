@@ -14,5 +14,6 @@
   </head>
 
   <body class="bg-gray-100 font-[Comic_Sans_MS] p-6">
+    <%- include('breadcrumbs.ejs',{path: ["Courses"],isEnrolled: false,isAuthor: false}) %>
     <%- include('courseList.ejs', {heading: "My Courses", isEnrolled: true}) %>
   </body>

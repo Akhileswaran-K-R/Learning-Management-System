@@ -11,36 +11,30 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   </head>
 
-  <body class="bg-white min-h-screen font-[Comic_Sans_MS]">
-    <div class="text-base text-gray-600 mb-4 px-10 pt-10">
-      <a href="/" class="text-blue-600 underline hover:text-blue-800">Home</a> &gt; 
-      <a href="/courses/<%= course.id %>/chapters" class="text-blue-600 underline hover:text-blue-800"><%= course.title %></a> &gt;
-      Create a new chapter
-    </div>
+  <body class="bg-white min-h-screen font-[Comic_Sans_MS] px-24 py-16 leading-relaxed">
+    <%- include("breadcrumbs.ejs",{path: [`/courses/${course.id}/chapters`,course.title,"Create a new chapter"],isAuthor: true}) %>
 
-    <div class="p-10 pt-3">
-      <h1 class="text-[3rem] font-bold mb-10">Create Chapter</h1>
-  
-      <form method="POST" class="space-y-8">
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-  
-        <div>
-          <label for="title" class="block text-gray-700 mb-4">Title</label>
-          <input type="text" id="title" name="title" placeholder="Chapter name" class="w-[1000px] border px-4 py-2 rounded" required>
-        </div>
-  
-        <div>
-          <label for="description" class="block text-gray-700 mb-4">Description</label>
-          <textarea id="description" name="description" rows="7" placeholder="A brief description for the chapter" class="w-[1000px] border px-4 py-2 rounded" required></textarea>
-        </div>
-  
-        <div>
-          <button type="submit" class="bg-black text-white py-2 px-8 rounded hover:bg-gray-800 font-semibold">
-            Submit
-          </button>
-        </div>
-      </form>
-    </div>
+    <h1 class="text-[3rem] font-bold mb-10">Create Chapter</h1>
+
+    <form method="POST" class="space-y-8">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+      <div>
+        <label for="title" class="block text-gray-700 mb-4">Title</label>
+        <input type="text" id="title" name="title" placeholder="Chapter name" class="w-[1000px] border px-4 py-2 rounded" required>
+      </div>
+
+      <div>
+        <label for="description" class="block text-gray-700 mb-4">Description</label>
+        <textarea id="description" name="description" rows="7" placeholder="A brief description for the chapter" class="w-[1000px] border px-4 py-2 rounded" required></textarea>
+      </div>
+
+      <div>
+        <button type="submit" class="bg-black text-white py-2 px-8 rounded hover:bg-gray-800 font-semibold">
+          Submit
+        </button>
+      </div>
+    </form>
 
   </body>
 </html>

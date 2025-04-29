@@ -1,0 +1,12 @@
+<div class="text-base text-gray-600 mb-4">
+  <a href="/" class="text-blue-600 underline hover:text-blue-800">Home</a> &gt;
+  <% if(isAuthor || isEnrolled) { %>
+    <a href="/courses" class="text-blue-600 underline hover:text-blue-800">Courses</a> &gt;
+  <% } %>
+  
+  <% for(var i=0;i < path.length-1;i+=2) { %>
+    <a href="<%= path[i] %>" class="text-blue-600 underline hover:text-blue-800"><%= path[i+1] %></a> &gt;
+  <% } %>
+
+  <%= path[path.length-1] %>
+</div>

@@ -11,36 +11,29 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   </head>
 
-  <body class="bg-white min-h-screen font-[Comic_Sans_MS]">
-    <div class="text-base text-gray-600 mb-4 px-10 pt-10">
-      <a href="/" class="text-blue-600 underline hover:text-blue-800">Home</a> &gt; 
-      <a href="/courses/<%= course.id %>/chapters" class="text-blue-600 underline hover:text-blue-800"><%= course.title %></a> &gt;
-      <a href="/chapters/<%= chapter.id %>/pages" class="text-blue-600 underline hover:text-blue-800"><%= chapter.title %></a> &gt;
-      New Page
-    </div>
+  <body class="bg-white min-h-screen font-[Comic_Sans_MS] px-24 py-16 leading-relaxed">
+    <%- include("breadcrumbs.ejs",{path: [`/courses/${course.id}/chapters`,course.title,`/chapters/${chapter.id}/pages`,chapter.title,"New Page"],isAuthor: true}) %>
   
-    <div class="p-10 pt-3">
-      <h1 class="text-[3rem] font-bold mb-10">New Page</h1>
+    <h1 class="text-[3rem] font-bold mb-10">New Page</h1>
   
-      <form method="POST" class="space-y-8">
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-  
-        <div>
-          <label for="title" class="block text-gray-700 mb-4">Title</label>
-          <input type="text" id="title" name="title" placeholder="Page heading" class="w-[1000px] border px-4 py-2 rounded" required>
-        </div>
-  
-        <div>
-          <label for="content" class="block text-gray-700 mb-4">Content</label>
-          <textarea id="content" name="content" rows="10" placeholder="Detailed Content" class="w-[1000px] border px-4 py-2 rounded" required></textarea>
-        </div>
-  
-        <div>
-          <button type="submit" class="bg-black text-white py-2 px-8 rounded hover:bg-gray-800 font-semibold">
-            Submit
-          </button>
-        </div>
-      </form>
-    </div>
+    <form method="POST" class="space-y-8">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+      <div>
+        <label for="title" class="block text-gray-700 mb-4">Title</label>
+        <input type="text" id="title" name="title" placeholder="Page heading" class="w-[1000px] border px-4 py-2 rounded" required>
+      </div>
+
+      <div>
+        <label for="content" class="block text-gray-700 mb-4">Content</label>
+        <textarea id="content" name="content" rows="10" placeholder="Detailed Content" class="w-[1000px] border px-4 py-2 rounded" required></textarea>
+      </div>
+
+      <div>
+        <button type="submit" class="bg-black text-white py-2 px-8 rounded hover:bg-gray-800 font-semibold">
+          Submit
+        </button>
+      </div>
+    </form>
   </body>
 </html>

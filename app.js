@@ -418,6 +418,10 @@ app.get(
       const course = await chapter.getCourse();
       const pages = await chapter.getPages();
       const isAuthor = request.user.id === (await course.getUser()).id ? 1 : 0;
+      const isEnrolled = await Enrollment.checkEnrollment(
+        request.user.id,
+        course.id,
+      );
 
       return response.render("page", {
         title: "Pages",
@@ -425,6 +429,7 @@ app.get(
         chapter,
         pages,
         isAuthor,
+        isEnrolled,
         csrfToken: request.csrfToken(),
       });
     } catch (error) {
@@ -476,6 +481,10 @@ app.get(
     const chapter = await page.getChapter();
     const course = await chapter.getCourse();
     const isAuthor = request.user.id === (await course.getUser()).id ? 1 : 0;
+    const isEnrolled = await Enrollment.checkEnrollment(
+      request.user.id,
+      course.id,
+    );
 
     response.render("content", {
       title: "Content",
@@ -483,6 +492,7 @@ app.get(
       chapter,
       course,
       isAuthor,
+      isEnrolled,
       csrfToken: request.csrfToken(),
     });
   },
@@ -525,6 +535,21 @@ app.delete(
   async (request, response) => {
     try {
       await Pages.deletePage(request.params.id);
+      return response.json(true);
+    } catch (error) {
+      console.error(error);
+      return response.status(422).json(false);
+    }
+  },
+);
+
+app.delete(
+  "/courses/:id/unenroll",
+  requireStudent,
+  requireEnrolled,
+  async (request, response) => {
+    try {
+      await Enrollment.unenroll(request.user.id, request.params.id);
       return response.json(true);
     } catch (error) {
       console.error(error);

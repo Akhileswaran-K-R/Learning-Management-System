@@ -12,9 +12,7 @@
   </head>
 
   <body class="bg-white min-h-screen px-24 py-16 font-[Comic_Sans_MS] text-[1.5rem] leading-relaxed">
-    <div class="text-base text-gray-600 mb-4">
-      <a href="/" class="text-blue-600 underline hover:text-blue-800">Home</a> &gt; Create New Course
-    </div>
+    <%- include("breadcrumbs.ejs",{path: ["Create New Course"],isAuthor: true}) %>
 
     <h1 class="text-[3rem] font-bold mb-12">Create New Course</h1>
 

@@ -10,10 +10,9 @@
     <title><%= title %></title>
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="/js/scripts.js"></script>
 
     <script>
-      const token = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
-
       function deleteCourse(id){
         fetch(`/courses/${id}/chapters`,{
           method: "delete",
@@ -32,14 +31,10 @@
         });
       }
     </script>
-    <script src="/js/scripts.js"></script>
   </head>
 
   <body class="bg-gray-100 font-[Comic_Sans_MS] text-[1.2rem] px-24 py-16 min-h-screen leading-relaxed">
-    
-    <div class="text-base text-gray-600 mb-4">
-      <a href="/" class="text-blue-600 underline hover:text-blue-800">Home</a> &gt; <%= course.title %>
-    </div>
+    <%- include('breadcrumbs.ejs',{path: [course.title]}) %>
 
     <div class="flex justify-between mb-6">
       <div class="w-2/3 pr-8">

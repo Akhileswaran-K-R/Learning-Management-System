@@ -44,6 +44,15 @@ module.exports = (sequelize, DataTypes) => {
         },
       });
     }
+
+    static unenroll(studentId, courseId) {
+      return this.destroy({
+        where: {
+          studentId,
+          courseId,
+        },
+      });
+    }
   }
   Enrollment.init(
     {
