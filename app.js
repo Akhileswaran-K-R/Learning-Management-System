@@ -271,7 +271,7 @@ app.get(
           csrfToken: request.csrfToken(),
         });
       } else {
-        response.json(courses);
+        return response.json({ courses });
       }
     } catch (error) {
       console.error(error);
@@ -303,12 +303,16 @@ app.get(
         course.count = await Enrollment.getCourseEnrolledCount(course.id);
       }
 
-      return response.render("course", {
-        title: "My Courses",
-        courses,
-        role: request.user.role,
-        csrfToken: request.csrfToken(),
-      });
+      if (request.accepts("html")) {
+        return response.render("course", {
+          title: "My Courses",
+          courses,
+          role: request.user.role,
+          csrfToken: request.csrfToken(),
+        });
+      } else {
+        return response.json({ courses });
+      }
     } catch (error) {
       console.error(error);
     }
@@ -351,16 +355,20 @@ app.get(
       const instructor = await course.getUser();
       const isAuthor = request.user.id === instructor.id ? 1 : 0;
 
-      response.render("chapter", {
-        title: "Chapters",
-        chapters,
-        course,
-        role: request.user.role,
-        instructor,
-        isEnrolled,
-        isAuthor,
-        csrfToken: request.csrfToken(),
-      });
+      if (request.accepts("html")) {
+        response.render("chapter", {
+          title: "Chapters",
+          chapters,
+          course,
+          role: request.user.role,
+          instructor,
+          isEnrolled,
+          isAuthor,
+          csrfToken: request.csrfToken(),
+        });
+      } else {
+        return response.json({ chapters });
+      }
     } catch (error) {
       console.error(error);
     }
