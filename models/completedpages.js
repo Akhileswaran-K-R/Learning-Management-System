@@ -19,6 +19,22 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
       });
     }
+
+    static markAsComplete(studentId, pageId) {
+      return this.create({
+        studentId,
+        pageId,
+      });
+    }
+
+    static checkComplete(studentId, pageId) {
+      return this.findOne({
+        where: {
+          studentId,
+          pageId,
+        },
+      });
+    }
   }
   CompletedPages.init(
     {

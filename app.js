@@ -431,6 +431,13 @@ app.get(
         course.id,
       );
 
+      for (const page of pages) {
+        page.complete = await CompletedPages.checkComplete(
+          request.user.id,
+          page.id,
+        );
+      }
+
       if (request.accepts("html")) {
         return response.render("page", {
           title: "Pages",
@@ -497,6 +504,10 @@ app.get(
       request.user.id,
       course.id,
     );
+    const isComplete = await CompletedPages.checkComplete(
+      request.user.id,
+      page.id,
+    );
 
     response.render("content", {
       title: "Content",
@@ -505,10 +516,22 @@ app.get(
       course,
       isAuthor,
       isEnrolled,
+      isComplete,
+      role: request.user.role,
       csrfToken: request.csrfToken(),
     });
   },
 );
+
+app.put("/pages/:id", async (request, response) => {
+  try {
+    await CompletedPages.markAsComplete(request.user.id, request.params.id);
+    return response.json(true);
+  } catch (error) {
+    console.error(error);
+    return response.status(422).json(false);
+  }
+});
 
 app.delete(
   "/courses/:id/chapters",
