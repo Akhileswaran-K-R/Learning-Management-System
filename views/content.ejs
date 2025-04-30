@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="<%= csrfToken %>" >
     <meta name="chapterId" content="<%= chapter.id %>" >
-    <meta name="isComplete" content="<%= isComplete %>" >
+    <meta name="pageIds" content="<%= pages %>" >
     <link href="/css/styles.css" rel="stylesheet">
 
     <title><%= title %></title>
@@ -16,8 +16,7 @@
     <script>
       const token = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
       const chapterId = document.querySelector('meta[name="chapterId"]').getAttribute("content");
-      const isComplete = document.querySelector('meta[name="isComplete"]').getAttribute("content");
-      console.log(isComplete);
+      const pageIds = document.querySelector('meta[name="pageIds"]').getAttribute("content").split(',').map(Number);
 
       function markAsComplete(id){
         fetch(`/pages/${id}`,{
@@ -35,6 +34,15 @@
         }).catch((error)=>{
           console.error(error);
         });
+      }
+
+      function nextPage(id){
+        const index = pageIds.indexOf(id);
+        if(index < pageIds.length-1){
+          const newid = pageIds[index + 1];
+          console.log(newid);
+          window.location.href = `/pages/${newid}`;
+        }
       }
 
       function deletePage(id){
@@ -86,7 +94,7 @@
             Mark as complete
           </button>
         <% } %>
-        <button class="bg-green-500 hover:bg-green-600 text-white font-semibold px-8 py-3 rounded-md flex items-center gap-2">
+        <button class="bg-green-500 hover:bg-green-600 text-white font-semibold px-8 py-3 rounded-md flex items-center gap-2" onclick="nextPage(<%= page.id %>)">
           Next 
           <span>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">

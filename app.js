@@ -498,6 +498,7 @@ app.get(
   async (request, response) => {
     const page = await Pages.findPage(request.params.id);
     const chapter = await page.getChapter();
+    let pages = await chapter.getPages();
     const course = await chapter.getCourse();
     const isAuthor = request.user.id === (await course.getUser()).id ? 1 : 0;
     const isEnrolled = await Enrollment.checkEnrollment(
@@ -509,9 +510,14 @@ app.get(
       page.id,
     );
 
+    pages = pages.map((page) => {
+      return page.id;
+    });
+
     response.render("content", {
       title: "Content",
       page,
+      pages,
       chapter,
       course,
       isAuthor,
@@ -523,15 +529,20 @@ app.get(
   },
 );
 
-app.put("/pages/:id", async (request, response) => {
-  try {
-    await CompletedPages.markAsComplete(request.user.id, request.params.id);
-    return response.json(true);
-  } catch (error) {
-    console.error(error);
-    return response.status(422).json(false);
-  }
-});
+app.put(
+  "/pages/:id",
+  requireStudent,
+  requireEnrolled,
+  async (request, response) => {
+    try {
+      await CompletedPages.markAsComplete(request.user.id, request.params.id);
+      return response.json(true);
+    } catch (error) {
+      console.error(error);
+      return response.status(422).json(false);
+    }
+  },
+);
 
 app.delete(
   "/courses/:id/chapters",
