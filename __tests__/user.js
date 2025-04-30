@@ -11,6 +11,48 @@ function extractCsrfToken(res) {
   return $("[name=_csrf]").val();
 }
 
+function extractCsrfTokenMeta(res) {
+  const $ = cheerio.load(res.text);
+  return $('meta[name="csrf-token"]').attr("content");
+}
+
+async function addCourse(agent) {
+  const res = await agent.get("/courses/new");
+  const csrfToken = extractCsrfToken(res);
+  const response = await agent.post("/courses/new").send({
+    title: "Java",
+    _csrf: csrfToken,
+  });
+
+  return response;
+}
+
+async function addChapter(agent, id) {
+  const res = await agent.get(`/courses/${id}/chapters/new`);
+  const csrfToken = extractCsrfToken(res);
+
+  const response = await agent.post(`/courses/${id}/chapters/new`).send({
+    title: "Java is simple",
+    description: "Basic syntax in java",
+    _csrf: csrfToken,
+  });
+
+  return response;
+}
+
+async function addPage(agent, id) {
+  const res = await agent.get(`/chapters/${id}/pages/new`);
+  const csrfToken = extractCsrfToken(res);
+
+  const response = agent.post(`/chapters/${id}/pages/new`).send({
+    title: "Hello world",
+    content: `System.out.println("Hello world");`,
+    _csrf: csrfToken,
+  });
+
+  return response;
+}
+
 const login = async (agent, username, password) => {
   let res = await agent.get("/login");
   let csrfToken = extractCsrfToken(res);
@@ -61,73 +103,153 @@ describe("User test suite", () => {
     const agent = request.agent(server);
     await login(agent, "user.a@test.com", "12345678");
 
-    const res = await agent.get("/courses/new");
-    const csrfToken = extractCsrfToken(res);
-    const response = await agent.post("/courses/new").send({
-      title: "Java",
-      _csrf: csrfToken,
-    });
-
+    const response = await addCourse(agent);
     expect(response.statusCode).toBe(302);
   });
 
   test("Add Chapter", async () => {
     const agent = request.agent(server);
     await login(agent, "user.a@test.com", "12345678");
+    await addCourse(agent);
 
-    let groupedTodosResponse = await agent
+    let groupedResponse = await agent
       .get("/courses")
       .set("Accept", "application/json");
 
-    let parsedGroupedResponse = JSON.parse(groupedTodosResponse.text);
+    let parsedGroupedResponse = JSON.parse(groupedResponse.text);
     const courseCount = parsedGroupedResponse.courses.length;
     let latestCourse = parsedGroupedResponse.courses[courseCount - 1];
 
-    const res = await agent.get(`/courses/${latestCourse.id}/chapters/new`);
-    const csrfToken = extractCsrfToken(res);
-
-    const response = await agent
-      .post(`/courses/${latestCourse.id}/chapters/new`)
-      .send({
-        title: "Java is simple",
-        description: "Basic syntax in java",
-        _csrf: csrfToken,
-      });
-
+    const response = await addChapter(agent, latestCourse.id);
     expect(response.statusCode).toBe(302);
   });
 
   test("Add Page", async () => {
     const agent = request.agent(server);
     await login(agent, "user.a@test.com", "12345678");
+    await addCourse(agent);
 
-    let groupedTodosResponse = await agent
+    let groupedResponse = await agent
       .get("/courses")
       .set("Accept", "application/json");
 
-    let parsedGroupedResponse = JSON.parse(groupedTodosResponse.text);
+    let parsedGroupedResponse = JSON.parse(groupedResponse.text);
     const courseCount = parsedGroupedResponse.courses.length;
     let latestCourse = parsedGroupedResponse.courses[courseCount - 1];
+    await addChapter(agent, latestCourse.id);
 
-    groupedTodosResponse = await agent
+    groupedResponse = await agent
       .get(`/courses/${latestCourse.id}/chapters`)
       .set("Accept", "application/json");
 
-    parsedGroupedResponse = JSON.parse(groupedTodosResponse.text);
+    parsedGroupedResponse = JSON.parse(groupedResponse.text);
     const chapterCount = parsedGroupedResponse.chapters.length;
     let latestChapter = parsedGroupedResponse.chapters[chapterCount - 1];
 
-    const res = await agent.get(`/chapters/${latestChapter.id}/pages/new`);
-    const csrfToken = extractCsrfToken(res);
+    const response = await addPage(agent, latestChapter.id);
+    expect(response.statusCode).toBe(302);
+  });
 
-    const response = await agent
-      .post(`/chapters/${latestChapter.id}/pages/new`)
+  test("Delete Course", async () => {
+    const agent = request.agent(server);
+    await login(agent, "user.a@test.com", "12345678");
+    await addCourse(agent);
+
+    let groupedResponse = await agent
+      .get("/courses")
+      .set("Accept", "application/json");
+
+    let parsedGroupedResponse = JSON.parse(groupedResponse.text);
+    const courseCount = parsedGroupedResponse.courses.length;
+    let latestCourse = parsedGroupedResponse.courses[courseCount - 1];
+
+    const res = await agent.get(`/courses/${latestCourse.id}/chapters`);
+    const csrfToken = extractCsrfTokenMeta(res);
+
+    const deleteResponse = await agent
+      .delete(`/courses/${latestCourse.id}/chapters`)
       .send({
-        title: "Hello world",
-        content: `System.out.println("Hello world");`,
         _csrf: csrfToken,
       });
 
-    expect(response.statusCode).toBe(302);
+    const result = JSON.parse(deleteResponse.text);
+    expect(result).toBe(true);
+  });
+
+  test("Delete Chapter", async () => {
+    const agent = request.agent(server);
+    await login(agent, "user.a@test.com", "12345678");
+    await addCourse(agent);
+
+    let groupedResponse = await agent
+      .get("/courses")
+      .set("Accept", "application/json");
+
+    let parsedGroupedResponse = JSON.parse(groupedResponse.text);
+    const courseCount = parsedGroupedResponse.courses.length;
+    let latestCourse = parsedGroupedResponse.courses[courseCount - 1];
+    await addChapter(agent, latestCourse.id);
+
+    groupedResponse = await agent
+      .get(`/courses/${latestCourse.id}/chapters`)
+      .set("Accept", "application/json");
+
+    parsedGroupedResponse = JSON.parse(groupedResponse.text);
+    const chapterCount = parsedGroupedResponse.chapters.length;
+    let latestChapter = parsedGroupedResponse.chapters[chapterCount - 1];
+
+    const res = await agent.get(`/chapters/${latestChapter.id}/pages`);
+    const csrfToken = extractCsrfTokenMeta(res);
+
+    const deleteResponse = await agent
+      .delete(`/chapters/${latestChapter.id}/pages`)
+      .send({
+        _csrf: csrfToken,
+      });
+
+    const result = JSON.parse(deleteResponse.text);
+    expect(result).toBe(true);
+  });
+
+  test("Delete Page", async () => {
+    const agent = request.agent(server);
+    await login(agent, "user.a@test.com", "12345678");
+    await addCourse(agent);
+
+    let groupedResponse = await agent
+      .get("/courses")
+      .set("Accept", "application/json");
+
+    let parsedGroupedResponse = JSON.parse(groupedResponse.text);
+    const courseCount = parsedGroupedResponse.courses.length;
+    let latestCourse = parsedGroupedResponse.courses[courseCount - 1];
+    await addChapter(agent, latestCourse.id);
+
+    groupedResponse = await agent
+      .get(`/courses/${latestCourse.id}/chapters`)
+      .set("Accept", "application/json");
+
+    parsedGroupedResponse = JSON.parse(groupedResponse.text);
+    const chapterCount = parsedGroupedResponse.chapters.length;
+    let latestChapter = parsedGroupedResponse.chapters[chapterCount - 1];
+    await addPage(agent, latestChapter.id);
+
+    groupedResponse = await agent
+      .get(`/chapters/${latestChapter.id}/pages`)
+      .set("Accept", "application/json");
+
+    parsedGroupedResponse = JSON.parse(groupedResponse.text);
+    const pageCount = parsedGroupedResponse.pages.length;
+    let latestPage = parsedGroupedResponse.pages[pageCount - 1];
+
+    const res = await agent.get(`/pages/${latestPage.id}`);
+    const csrfToken = extractCsrfTokenMeta(res);
+
+    const deleteResponse = await agent.delete(`/pages/${latestPage.id}`).send({
+      _csrf: csrfToken,
+    });
+
+    const result = JSON.parse(deleteResponse.text);
+    expect(result).toBe(true);
   });
 });

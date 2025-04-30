@@ -431,15 +431,19 @@ app.get(
         course.id,
       );
 
-      return response.render("page", {
-        title: "Pages",
-        course,
-        chapter,
-        pages,
-        isAuthor,
-        isEnrolled,
-        csrfToken: request.csrfToken(),
-      });
+      if (request.accepts("html")) {
+        return response.render("page", {
+          title: "Pages",
+          course,
+          chapter,
+          pages,
+          isAuthor,
+          isEnrolled,
+          csrfToken: request.csrfToken(),
+        });
+      } else {
+        return response.json({ pages });
+      }
     } catch (error) {
       console.error(error);
     }
