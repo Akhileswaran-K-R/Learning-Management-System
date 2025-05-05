@@ -36,6 +36,15 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
 
+    static getCourseCompletedCount(id) {
+      return this.count({
+        where: {
+          courseId: id,
+          completed: true,
+        },
+      });
+    }
+
     static checkEnrollment(studentId, courseId) {
       return this.findOne({
         where: {

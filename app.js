@@ -538,6 +538,33 @@ app.post(
   async (request, response) => {
     try {
       await CompletedPages.markAsComplete(request.user.id, request.params.id);
+
+      const page = await Pages.findPage(request.params.id);
+      const chapter = await page.getChapter();
+      const course = await chapter.getCourse();
+      const pages = await chapter.getPages();
+
+      let x = 0;
+      for (const page of pages) {
+        if (!(await CompletedPages.checkComplete(request.user.id, page.id))) {
+          break;
+        }
+        x++;
+      }
+
+      await Enrollment.update(
+        {
+          completed: x === pages.length,
+          progress: (x / pages.length) * 100,
+        },
+        {
+          where: {
+            studentId: request.user.id,
+            courseId: course.id,
+          },
+        },
+      );
+
       return response.json(true);
     } catch (error) {
       console.error(error);
@@ -605,5 +632,29 @@ app.delete(
     }
   },
 );
+
+app.get("/report", requireInstructor, async (request, response) => {
+  try {
+    const instructor = await User.findInstructor(request.user.id);
+    const courses = await instructor.getCourses();
+    let totalCount = 0,
+      totalCompleted = 0;
+    for (const course of courses) {
+      course.count = await Enrollment.getCourseEnrolledCount(course.id);
+      course.completed = await Enrollment.getCourseCompletedCount(course.id);
+      totalCount += course.count;
+      totalCompleted += course.completed;
+    }
+
+    response.render("report", {
+      title: "Report",
+      courses,
+      totalCount,
+      totalCompleted,
+    });
+  } catch (error) {
+    console.error(error);
+  }
+});
 
 module.exports = app;

@@ -4,37 +4,47 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="csrf-token" content="<%= csrfToken %>" >
     <link href="./css/styles.css" rel="stylesheet">
 
     <title><%= title %></title>
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   </head>
-  <body class="bg-gray-100 font-sans p-8">
-    <h1 class="text-3xl font-bold mb-8">Course Report</h1>
+
+  <body class="bg-gray-100 font-[Comic_Sans_MS] p-8">
+    <%- include("breadcrumbs.ejs",{path: ["Report"],isAuthor: false,isEnrolled: false}) %>
+    <h1 class="text-3xl font-bold mb-8">Report</h1>
 
     <div class="overflow-x-auto">
       <table class="min-w-full bg-white rounded shadow-md">
         <thead class="bg-gray-200 text-gray-700">
-          <tr>
-            <th class="text-left px-6 py-4">Course</th>
-            <th class="text-left px-6 py-4">Enrolled</th>
-            <th class="text-left px-6 py-4">Completed</th>
-            <th class="text-left px-6 py-4">Completion %</th>
+          <tr class="text-center">
+            <th class="py-4">Course</th>
+            <th class="py-4">Enrolled</th>
+            <th class="py-4">Completed</th>
+            <th class="py-4">Completion %</th>
           </tr>
         </thead>
         <tbody>
           <% courses.forEach(course => { %>
-            <tr class="border-t hover:bg-gray-50">
-              <td class="px-6 py-4 font-medium"><%= course.title %></td>
-              <td class="px-6 py-4"><%= course.enrolled %></td>
-              <td class="px-6 py-4"><%= course.completed %></td>
-              <td class="px-6 py-4">
-                <%= course.enrolled > 0 ? ((course.completed / course.enrolled) * 100).toFixed(1) : "0.0" %>%
+            <tr class="border-t hover:bg-gray-50 text-center">
+              <td class="py-4 font-medium"><%= course.title %></td>
+              <td class="py-4"><%= course.count %></td>
+              <td class="py-4"><%= course.completed %></td>
+              <td class="py-4">
+                <%= course.count > 0 ? ((course.completed / course.count) * 100).toFixed(1) : "0" %>%
               </td>
             </tr>
           <% }) %>
+
+          <tr class="font-bold border-t bg-gray-100 text-center">
+            <td class="py-2">Total</td>
+            <td class="py-2"><%= totalCount %></td>
+            <td class="py-2"><%= totalCompleted %></td>
+            <td class="py-2">
+              <%= totalCount > 0 ? ((totalCompleted / totalCount) * 100).toFixed(1) : 0 %>%
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
