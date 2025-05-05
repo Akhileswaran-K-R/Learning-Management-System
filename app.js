@@ -431,11 +431,13 @@ app.get(
         course.id,
       );
 
-      for (const page of pages) {
-        page.complete = await CompletedPages.checkComplete(
-          request.user.id,
-          page.id,
-        );
+      if (isEnrolled) {
+        for (const page of pages) {
+          page.complete = await CompletedPages.checkComplete(
+            isEnrolled.id,
+            page.id,
+          );
+        }
       }
 
       if (request.accepts("html")) {
@@ -505,10 +507,11 @@ app.get(
       request.user.id,
       course.id,
     );
-    const isComplete = await CompletedPages.checkComplete(
-      request.user.id,
-      page.id,
-    );
+
+    let isComplete = 0;
+    if (isEnrolled) {
+      isComplete = await CompletedPages.checkComplete(isEnrolled.id, page.id);
+    }
 
     pages = pages.map((page) => {
       return page.id;
@@ -537,16 +540,20 @@ app.post(
   requireEnrolled,
   async (request, response) => {
     try {
-      await CompletedPages.markAsComplete(request.user.id, request.params.id);
-
       const page = await Pages.findPage(request.params.id);
       const chapter = await page.getChapter();
       const course = await chapter.getCourse();
       const pages = await chapter.getPages();
 
+      const enrolled = await Enrollment.checkEnrollment(
+        request.user.id,
+        course.id,
+      );
+      await CompletedPages.markAsComplete(enrolled.id, request.params.id);
+
       let x = 0;
       for (const page of pages) {
-        if (!(await CompletedPages.checkComplete(request.user.id, page.id))) {
+        if (!(await CompletedPages.checkComplete(enrolled.id, page.id))) {
           break;
         }
         x++;
@@ -555,7 +562,7 @@ app.post(
       await Enrollment.update(
         {
           completed: x === pages.length,
-          progress: (x / pages.length) * 100,
+          progress: ((x / pages.length) * 100).toFixed(1),
         },
         {
           where: {
@@ -655,6 +662,17 @@ app.get("/report", requireInstructor, async (request, response) => {
   } catch (error) {
     console.error(error);
   }
+});
+
+app.get("/progress", requireStudent, async (request, response) => {
+  const enrollments = await Enrollment.getEnrolledCourses(
+    request.user.id,
+    Course,
+  );
+  response.render("progress", {
+    title: "Progress",
+    enrollments,
+  });
 });
 
 module.exports = app;

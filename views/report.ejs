@@ -31,9 +31,7 @@
               <td class="py-4 font-medium"><%= course.title %></td>
               <td class="py-4"><%= course.count %></td>
               <td class="py-4"><%= course.completed %></td>
-              <td class="py-4">
-                <%= course.count > 0 ? ((course.completed / course.count) * 100).toFixed(1) : "0" %>%
-              </td>
+              <td class="py-4"><%= ((course.completed / course.count) * 100).toFixed(1) %>%</td>
             </tr>
           <% }) %>
 
@@ -41,9 +39,7 @@
             <td class="py-2">Total</td>
             <td class="py-2"><%= totalCount %></td>
             <td class="py-2"><%= totalCompleted %></td>
-            <td class="py-2">
-              <%= totalCount > 0 ? ((totalCompleted / totalCount) * 100).toFixed(1) : 0 %>%
-            </td>
+            <td class="py-2"><%= ((totalCompleted / totalCount) * 100).toFixed(1) %>% </td>
           </tr>
         </tbody>
       </table>

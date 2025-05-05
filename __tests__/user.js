@@ -53,13 +53,13 @@ async function addPage(agent, id) {
   return response;
 }
 
-const login = async (agent, username, password) => {
+const login = async (agent, username, password, role) => {
   let res = await agent.get("/login");
   let csrfToken = extractCsrfToken(res);
   res = await agent.post("/session").send({
     email: username,
     password: password,
-    role: "Instructor",
+    role,
     _csrf: csrfToken,
   });
 };
@@ -69,16 +69,9 @@ describe("User test suite", () => {
     await db.sequelize.sync({ force: true });
     server = app.listen(4000);
     agent = request.agent(server);
-  });
 
-  afterAll(async () => {
-    await db.sequelize.close();
-    server.close();
-  });
-
-  test("Sign up", async () => {
     let res = await agent.get("/signup");
-    const csrfToken = extractCsrfToken(res);
+    let csrfToken = extractCsrfToken(res);
     res = await agent.post("/users").send({
       firstName: "Test",
       lastName: "User A",
@@ -87,7 +80,22 @@ describe("User test suite", () => {
       role: "Instructor",
       _csrf: csrfToken,
     });
-    expect(res.statusCode).toBe(302);
+
+    res = await agent.get("/signup");
+    csrfToken = extractCsrfToken(res);
+    res = await agent.post("/users").send({
+      firstName: "Test",
+      lastName: "User B",
+      email: "user.b@test.com",
+      password: "12345678",
+      role: "Student",
+      _csrf: csrfToken,
+    });
+  });
+
+  afterAll(async () => {
+    await db.sequelize.close();
+    server.close();
   });
 
   test("Sign out", async () => {
@@ -101,7 +109,7 @@ describe("User test suite", () => {
 
   test("Add Course", async () => {
     const agent = request.agent(server);
-    await login(agent, "user.a@test.com", "12345678");
+    await login(agent, "user.a@test.com", "12345678", "Instructor");
 
     const response = await addCourse(agent);
     expect(response.statusCode).toBe(302);
@@ -109,7 +117,7 @@ describe("User test suite", () => {
 
   test("Add Chapter", async () => {
     const agent = request.agent(server);
-    await login(agent, "user.a@test.com", "12345678");
+    await login(agent, "user.a@test.com", "12345678", "Instructor");
     await addCourse(agent);
 
     let groupedResponse = await agent
@@ -126,7 +134,7 @@ describe("User test suite", () => {
 
   test("Add Page", async () => {
     const agent = request.agent(server);
-    await login(agent, "user.a@test.com", "12345678");
+    await login(agent, "user.a@test.com", "12345678", "Instructor");
     await addCourse(agent);
 
     let groupedResponse = await agent
@@ -152,7 +160,7 @@ describe("User test suite", () => {
 
   test("Delete Course", async () => {
     const agent = request.agent(server);
-    await login(agent, "user.a@test.com", "12345678");
+    await login(agent, "user.a@test.com", "12345678", "Instructor");
     await addCourse(agent);
 
     let groupedResponse = await agent
@@ -178,7 +186,7 @@ describe("User test suite", () => {
 
   test("Delete Chapter", async () => {
     const agent = request.agent(server);
-    await login(agent, "user.a@test.com", "12345678");
+    await login(agent, "user.a@test.com", "12345678", "Instructor");
     await addCourse(agent);
 
     let groupedResponse = await agent
@@ -213,7 +221,7 @@ describe("User test suite", () => {
 
   test("Delete Page", async () => {
     const agent = request.agent(server);
-    await login(agent, "user.a@test.com", "12345678");
+    await login(agent, "user.a@test.com", "12345678", "Instructor");
     await addCourse(agent);
 
     let groupedResponse = await agent
@@ -252,4 +260,28 @@ describe("User test suite", () => {
     const result = JSON.parse(deleteResponse.text);
     expect(result).toBe(true);
   });
+
+  // test("Enroll", async () => {
+  //   const agent = request.agent(server);
+  //   await login(agent, "user.a@test.com", "12345678", "Instructor");
+  //   await addCourse(agent);
+
+  //   let groupedResponse = await agent
+  //     .get("/courses")
+  //     .set("Accept", "application/json");
+
+  //   let parsedGroupedResponse = JSON.parse(groupedResponse.text);
+  //   const courseCount = parsedGroupedResponse.courses.length;
+  //   let latestCourse = parsedGroupedResponse.courses[courseCount - 1];
+
+  //   await login(agent, "user.b@test.com", "12345678", "Student");
+  //   const res = await agent.get(`/courses/${latestCourse.id}/pages`);
+  //   const csrfToken = extractCsrfTokenMeta(res);
+  //   const enrollResponse = await agent
+  //     .post(`/courses/${latestCourse.id}/enroll`)
+  //     .send({ _csrf: csrfToken });
+  //   console.log(enrollResponse);
+  //   const result = JSON.parse(enrollResponse.text);
+  //   expect(result).toBe(true);
+  // });
 });

@@ -9,8 +9,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      CompletedPages.belongsTo(models.User, {
-        foreignKey: "studentId",
+      CompletedPages.belongsTo(models.Enrollment, {
+        foreignKey: "enrollmentId",
         onDelete: "CASCADE",
       });
 
@@ -20,17 +20,17 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
 
-    static markAsComplete(studentId, pageId) {
+    static markAsComplete(enrollmentId, pageId) {
       return this.create({
-        studentId,
+        enrollmentId,
         pageId,
       });
     }
 
-    static checkComplete(studentId, pageId) {
+    static checkComplete(enrollmentId, pageId) {
       return this.findOne({
         where: {
-          studentId,
+          enrollmentId,
           pageId,
         },
       });
@@ -38,10 +38,10 @@ module.exports = (sequelize, DataTypes) => {
   }
   CompletedPages.init(
     {
-      studentId: {
+      enrollmentId: {
         type: DataTypes.INTEGER,
         references: {
-          model: "Users",
+          model: "Enrollments",
           key: "id",
         },
       },

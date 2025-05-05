@@ -29,7 +29,7 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
       },
-      progess: {
+      progress: {
         type: Sequelize.DECIMAL,
       },
       createdAt: {

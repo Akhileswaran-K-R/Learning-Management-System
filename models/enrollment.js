@@ -18,6 +18,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "courseId",
         onDelete: "CASCADE",
       });
+
+      Enrollment.hasMany(models.CompletedPages, {
+        foreignKey: "enrollmentId",
+      });
     }
 
     static enroll(studentId, courseId) {
@@ -54,6 +58,15 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
 
+    static getEnrolledCourses(studentId, Course) {
+      return Enrollment.findAll({
+        where: {
+          studentId,
+        },
+        include: Course,
+      });
+    }
+
     static unenroll(studentId, courseId) {
       return this.destroy({
         where: {
@@ -80,7 +93,7 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       completed: DataTypes.BOOLEAN,
-      progess: DataTypes.DECIMAL,
+      progress: DataTypes.DECIMAL,
     },
     {
       sequelize,

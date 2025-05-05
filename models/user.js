@@ -15,9 +15,6 @@ module.exports = (sequelize, DataTypes) => {
       User.hasMany(models.Enrollment, {
         foreignKey: "studentId",
       });
-      User.hasMany(models.CompletedPages, {
-        foreignKey: "studentId",
-      });
     }
 
     static addUser({ firstName, lastName, email, password, role }) {
