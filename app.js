@@ -514,10 +514,12 @@ app.get(
       return page.id;
     });
 
+    const nextPage = pages.find((pageId) => pageId > request.params.id);
+
     response.render("content", {
       title: "Content",
       page,
-      pages,
+      nextPage,
       chapter,
       course,
       isAuthor,
@@ -529,7 +531,7 @@ app.get(
   },
 );
 
-app.put(
+app.post(
   "/pages/:id",
   requireStudent,
   requireEnrolled,
