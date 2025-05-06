@@ -83,7 +83,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "Pages",
-    }
+    },
   );
   return Pages;
 };
