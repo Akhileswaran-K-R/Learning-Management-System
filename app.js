@@ -41,7 +41,7 @@ app.use(
     cookie: {
       maxAge: 24 * 60 * 60 * 1000, //24hrs
     },
-  }),
+  })
 );
 
 app.use((request, response, next) => {
@@ -79,8 +79,8 @@ passport.use(
         .catch((error) => {
           return error;
         });
-    },
-  ),
+    }
+  )
 );
 
 passport.serializeUser((user, done) => {
@@ -246,7 +246,7 @@ app.post(
         return response.redirect(`/`);
       });
     }
-  },
+  }
 );
 
 app.get(
@@ -258,13 +258,13 @@ app.get(
       if (request.user.role === "Instructor") {
         courses = await Course.getAvailableInstructorCourses(
           User,
-          request.user.id,
+          request.user.id
         );
       } else {
         courses = await Course.getAvailableStudentCourses(
           User,
           Enrollment,
-          request.user.id,
+          request.user.id
         );
       }
 
@@ -289,7 +289,7 @@ app.get(
     } catch (error) {
       console.error(error);
     }
-  },
+  }
 );
 
 app.get(
@@ -308,7 +308,7 @@ app.get(
         courses = await Course.getEnrolledCourses(
           User,
           Enrollment,
-          request.user.id,
+          request.user.id
         );
       }
 
@@ -329,7 +329,7 @@ app.get(
     } catch (error) {
       console.error(error);
     }
-  },
+  }
 );
 
 app.get("/courses/new", requireInstructor, async (request, response) => {
@@ -377,7 +377,7 @@ app.post(
       request.flash("error", msg);
       return response.redirect(request.url);
     }
-  },
+  }
 );
 
 app.get(
@@ -387,10 +387,12 @@ app.get(
     try {
       const course = await Course.findCourse(request.params.id);
       course.count = await Enrollment.getCourseEnrolledCount(course.id);
-      const chapters = await course.getChapters();
+      const chapters = await course.getChapters({
+        order: [["createdAt", "ASC"]],
+      });
       const isEnrolled = await Enrollment.checkEnrollment(
         request.user.id,
-        course.id,
+        course.id
       );
 
       const instructor = await course.getUser();
@@ -431,7 +433,7 @@ app.get(
     } catch (error) {
       console.error(error);
     }
-  },
+  }
 );
 
 app.post("/courses/:id/enroll", async (request, response) => {
@@ -454,7 +456,7 @@ app.get(
       course: await Course.findCourse(request.params.id),
       csrfToken: request.csrfToken(),
     });
-  },
+  }
 );
 
 app.post(
@@ -474,7 +476,7 @@ app.post(
       request.flash("error", msg);
       return response.redirect(request.url);
     }
-  },
+  }
 );
 
 app.get(
@@ -485,18 +487,20 @@ app.get(
     try {
       const chapter = await Chapter.findChapter(request.params.id);
       const course = await chapter.getCourse();
-      const pages = await chapter.getPages();
+      const pages = await chapter.getPages({
+        order: [["createdAt", "ASC"]],
+      });
       const isAuthor = request.user.id === (await course.getUser()).id ? 1 : 0;
       const isEnrolled = await Enrollment.checkEnrollment(
         request.user.id,
-        course.id,
+        course.id
       );
 
       if (isEnrolled) {
         for (const page of pages) {
           page.complete = await CompletedPages.checkComplete(
             isEnrolled.id,
-            page.id,
+            page.id
           );
         }
       }
@@ -517,7 +521,7 @@ app.get(
     } catch (error) {
       console.error(error);
     }
-  },
+  }
 );
 
 app.get(
@@ -533,7 +537,7 @@ app.get(
       chapter,
       csrfToken: request.csrfToken(),
     });
-  },
+  }
 );
 
 app.post(
@@ -550,7 +554,7 @@ app.post(
       request.flash("error", msg);
       return response.redirect(request.url);
     }
-  },
+  }
 );
 
 app.get(
@@ -566,7 +570,7 @@ app.get(
       chapter,
       csrfToken: request.csrfToken(),
     });
-  },
+  }
 );
 
 app.post(
@@ -586,7 +590,7 @@ app.post(
       request.flash("error", msg);
       return response.redirect(request.url);
     }
-  },
+  }
 );
 
 app.get(
@@ -601,7 +605,7 @@ app.get(
     const isAuthor = request.user.id === (await course.getUser()).id ? 1 : 0;
     const isEnrolled = await Enrollment.checkEnrollment(
       request.user.id,
-      course.id,
+      course.id
     );
 
     let isComplete = 0;
@@ -631,7 +635,7 @@ app.get(
     } else {
       return response.json({ page });
     }
-  },
+  }
 );
 
 app.post(
@@ -646,7 +650,7 @@ app.post(
 
       const enrolled = await Enrollment.checkEnrollment(
         request.user.id,
-        course.id,
+        course.id
       );
       await CompletedPages.markAsComplete(enrolled.id, request.params.id);
 
@@ -655,7 +659,7 @@ app.post(
       console.error(error);
       return response.status(422).json(false);
     }
-  },
+  }
 );
 
 app.get(
@@ -674,7 +678,7 @@ app.get(
       page,
       csrfToken: request.csrfToken(),
     });
-  },
+  }
 );
 
 app.post(
@@ -687,11 +691,12 @@ app.post(
       await page.editPage(request.body.title, request.body.content);
       response.redirect(`/pages/${page.id}`);
     } catch (error) {
+      console.error(error);
       const msg = error.errors[0].message;
       request.flash("error", msg);
       return response.redirect(request.url);
     }
-  },
+  }
 );
 
 app.delete(
@@ -706,7 +711,7 @@ app.delete(
       console.error(error);
       return response.status(422).json(false);
     }
-  },
+  }
 );
 
 app.delete(
@@ -721,7 +726,7 @@ app.delete(
       console.error(error);
       return response.status(422).json(false);
     }
-  },
+  }
 );
 
 app.delete(
@@ -736,7 +741,7 @@ app.delete(
       console.error(error);
       return response.status(422).json(false);
     }
-  },
+  }
 );
 
 app.delete(
@@ -751,7 +756,7 @@ app.delete(
       console.error(error);
       return response.status(422).json(false);
     }
-  },
+  }
 );
 
 app.get("/report", requireInstructor, async (request, response) => {
@@ -781,7 +786,7 @@ app.get("/report", requireInstructor, async (request, response) => {
 app.get("/progress", requireStudent, async (request, response) => {
   let enrollments = await Enrollment.getEnrolledCourses(
     request.user.id,
-    Course,
+    Course
   );
 
   for (const enrollment of enrollments) {

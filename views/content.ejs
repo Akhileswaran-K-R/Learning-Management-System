@@ -58,7 +58,7 @@
   <body class="bg-white min-h-screen font-[Comic_Sans_MS] px-24 py-16 leading-relaxed">
     <%- include('breadcrumbs.ejs',{path: [`/courses/${course.id}/chapters`,course.title,`/chapters/${chapter.id}/pages`,chapter.title,page.title]}) %>
 
-    <div class="p-12 max-w-5xl mx-auto">
+    <div class="p-12 max-w-5xl mx-auto border ">
 
       <div class="flex justify-between items-center mb-8">
         <h1 class="text-4xl font-bold"><%= page.title %></h1>
@@ -70,7 +70,7 @@
         <% } %>
       </div>
 
-      <div class="space-y-6 text-lg leading-relaxed">
+      <div class="space-y-3 text-lg leading-relaxed">
         <% page.content.split('\n').forEach(paragraph => { %>
           <p><%= paragraph %></p>
         <% }) %>
