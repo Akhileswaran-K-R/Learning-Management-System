@@ -15,34 +15,37 @@
     <%- include("breadcrumbs.ejs",{path: ["Progress"],isAuthor: false,isEnrolled: false}) %>
     <h1 class="text-3xl font-bold mb-8 text-center">My Course Progress</h1>
   
-    <div class="max-w-4xl mx-auto space-y-6">
-      <% enrollments.forEach(enrollment => { %>
-        <div class="bg-white rounded shadow p-6">
-          <div class="flex justify-between items-center mb-2">
-            <h2 class="text-xl font-semibold"><%= enrollment.Course.title %></h2>
-            <span class="text-sm font-medium text-gray-600">
-              <% if(enrollment.completed) { %>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                    <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd" />
-                  </svg>
-                 Completed
-              <% } else { %> 
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
-                  </svg>
-                 In Progress 
-              <% } %>
-            </span>
-          </div>
-  
-          <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
-            <div class="bg-green-500 h-4 rounded-full transition-all duration-300 ease-in-out" style="width: <%= enrollment.progress %>%">
+    <% if(enrollments.length > 0) { %>
+      <div class="max-w-4xl mx-auto space-y-6">
+        <% enrollments.forEach(enrollment => { %>
+          <div class="bg-white rounded shadow p-6">
+            <div class="flex justify-between items-center mb-2">
+              <h2 class="text-xl font-semibold"><%= enrollment.Course.title %></h2>
+              <span class="text-sm font-medium text-gray-600">
+                <% if(enrollment.completed) { %>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                      <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd" />
+                    </svg>
+                  Completed
+                <% } else { %> 
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                      <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
+                    </svg>
+                  In Progress 
+                <% } %>
+              </span>
             </div>
+    
+            <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
+              <div class="bg-green-500 h-4 rounded-full transition-all duration-300 ease-in-out" style="width: <%= enrollment.progress %>%">
+              </div>
+            </div>
+            <p class="text-sm text-gray-600"><%= enrollment.progress %>% completed</p>
           </div>
-          <p class="text-sm text-gray-600"><%= enrollment.progress %>% completed</p>
-        </div>
-      <% }) %>
-    </div>
-  
+        <% }) %>
+      </div>
+    <% } else { %>
+      <p class="mt-5 text-center">You have no enrolled courses</p>
+    <% } %>
   </body>
 </html>

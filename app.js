@@ -23,6 +23,9 @@ const LocalStrategy = require("passport-local");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
+const flash = require("connect-flash");
+app.use(flash());
+
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
@@ -40,6 +43,11 @@ app.use(
     },
   }),
 );
+
+app.use((request, response, next) => {
+  response.locals.messages = request.flash();
+  next();
+});
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -155,7 +163,8 @@ async function requireEnrolled(req, res, next) {
   if (isEnrolled) {
     return next();
   } else {
-    res.status(401).json({ message: "Unauthorized user." });
+    req.flash("error", "Please enroll to access the chapters");
+    return res.redirect(`/courses/${course.id}/chapters`);
   }
 }
 
@@ -220,6 +229,7 @@ app.post(
   "/session",
   passport.authenticate("local", {
     failureRedirect: "/",
+    failureFlash: true,
   }),
   (request, response) => {
     if (request.body.role === request.user.role) {
@@ -229,7 +239,9 @@ app.post(
         if (err) {
           return next(err);
         }
-        return response.redirect(`/login?role=${request.body.role}`);
+        const msg = "Please login using the respective portal";
+        request.flash("error", msg);
+        return response.redirect(`/`);
       });
     }
   },
@@ -353,6 +365,24 @@ app.get(
 
       const instructor = await course.getUser();
       const isAuthor = request.user.id === instructor.id ? 1 : 0;
+
+      if (isEnrolled) {
+        for (const chapter of chapters) {
+          let pages = await chapter.getPages();
+          let x = 0;
+          for (const page of pages) {
+            if (await CompletedPages.checkComplete(isEnrolled.id, page.id)) {
+              x++;
+            }
+          }
+
+          if (x === pages.length) {
+            chapter.complete = true;
+          } else {
+            chapter.complete = false;
+          }
+        }
+      }
 
       if (request.accepts("html")) {
         response.render("chapter", {
