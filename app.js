@@ -426,7 +426,7 @@ app.get(
           csrfToken: request.csrfToken(),
         });
       } else {
-        return response.json({ chapters });
+        return response.json({ course, chapters });
       }
     } catch (error) {
       console.error(error);
@@ -512,7 +512,7 @@ app.get(
           csrfToken: request.csrfToken(),
         });
       } else {
-        return response.json({ pages });
+        return response.json({ chapter, pages });
       }
     } catch (error) {
       console.error(error);
@@ -615,18 +615,22 @@ app.get(
 
     const nextPage = pages.find((pageId) => pageId > request.params.id);
 
-    response.render("content", {
-      title: "Content",
-      page,
-      nextPage,
-      chapter,
-      course,
-      isAuthor,
-      isEnrolled,
-      isComplete,
-      role: request.user.role,
-      csrfToken: request.csrfToken(),
-    });
+    if (request.accepts("html")) {
+      response.render("content", {
+        title: "Content",
+        page,
+        nextPage,
+        chapter,
+        course,
+        isAuthor,
+        isEnrolled,
+        isComplete,
+        role: request.user.role,
+        csrfToken: request.csrfToken(),
+      });
+    } else {
+      return response.json({ page });
+    }
   },
 );
 

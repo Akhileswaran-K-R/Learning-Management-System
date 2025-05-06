@@ -158,6 +158,119 @@ describe("User test suite", () => {
     expect(response.statusCode).toBe(302);
   });
 
+  test("Edit Course", async () => {
+    const agent = request.agent(server);
+    await login(agent, "user.a@test.com", "12345678", "Instructor");
+    await addCourse(agent);
+
+    let groupedResponse = await agent
+      .get("/courses")
+      .set("Accept", "application/json");
+
+    let parsedGroupedResponse = JSON.parse(groupedResponse.text);
+    const courseCount = parsedGroupedResponse.courses.length;
+    let latestCourse = parsedGroupedResponse.courses[courseCount - 1];
+
+    const res = await agent.get(`/courses/${latestCourse.id}/edit`);
+    const csrfToken = extractCsrfToken(res);
+    await agent.post(`/courses/${latestCourse.id}/edit`).send({
+      title: "Programming in Java",
+      _csrf: csrfToken,
+    });
+
+    groupedResponse = await agent
+      .get(`/courses/${latestCourse.id}/chapters`)
+      .set("Accept", "application/json");
+    parsedGroupedResponse = JSON.parse(groupedResponse.text);
+    const { course } = parsedGroupedResponse;
+    expect(course.title).toBe("Programming in Java");
+  });
+
+  test("Edit Chapter", async () => {
+    const agent = request.agent(server);
+    await login(agent, "user.a@test.com", "12345678", "Instructor");
+    await addCourse(agent);
+
+    let groupedResponse = await agent
+      .get("/courses")
+      .set("Accept", "application/json");
+
+    let parsedGroupedResponse = JSON.parse(groupedResponse.text);
+    const courseCount = parsedGroupedResponse.courses.length;
+    let latestCourse = parsedGroupedResponse.courses[courseCount - 1];
+    await addChapter(agent, latestCourse.id);
+
+    groupedResponse = await agent
+      .get(`/courses/${latestCourse.id}/chapters`)
+      .set("Accept", "application/json");
+
+    parsedGroupedResponse = JSON.parse(groupedResponse.text);
+    const chapterCount = parsedGroupedResponse.chapters.length;
+    let latestChapter = parsedGroupedResponse.chapters[chapterCount - 1];
+
+    const res = await agent.get(`/chapters/${latestChapter.id}/edit`);
+    const csrfToken = extractCsrfToken(res);
+    await agent.post(`/chapters/${latestChapter.id}/edit`).send({
+      title: "Java Foundation",
+      description: "Basic programming in java",
+      _csrf: csrfToken,
+    });
+
+    groupedResponse = await agent
+      .get(`/chapters/${latestChapter.id}/pages`)
+      .set("Accept", "application/json");
+    parsedGroupedResponse = JSON.parse(groupedResponse.text);
+    const { chapter } = parsedGroupedResponse;
+    expect(chapter.title).toBe("Java Foundation");
+  });
+
+  test("Edit Page", async () => {
+    const agent = request.agent(server);
+    await login(agent, "user.a@test.com", "12345678", "Instructor");
+    await addCourse(agent);
+
+    let groupedResponse = await agent
+      .get("/courses")
+      .set("Accept", "application/json");
+
+    let parsedGroupedResponse = JSON.parse(groupedResponse.text);
+    const courseCount = parsedGroupedResponse.courses.length;
+    let latestCourse = parsedGroupedResponse.courses[courseCount - 1];
+    await addChapter(agent, latestCourse.id);
+
+    groupedResponse = await agent
+      .get(`/courses/${latestCourse.id}/chapters`)
+      .set("Accept", "application/json");
+
+    parsedGroupedResponse = JSON.parse(groupedResponse.text);
+    const chapterCount = parsedGroupedResponse.chapters.length;
+    let latestChapter = parsedGroupedResponse.chapters[chapterCount - 1];
+    await addPage(agent, latestChapter.id);
+
+    groupedResponse = await agent
+      .get(`/chapters/${latestChapter.id}/pages`)
+      .set("Accept", "application/json");
+
+    parsedGroupedResponse = JSON.parse(groupedResponse.text);
+    const pageCount = parsedGroupedResponse.pages.length;
+    let latestPage = parsedGroupedResponse.pages[pageCount - 1];
+
+    const res = await agent.get(`/pages/${latestPage.id}/edit`);
+    const csrfToken = extractCsrfToken(res);
+    await agent.post(`/pages/${latestPage.id}/edit`).send({
+      title: "A program for printing Hello world",
+      content: `System.out.println("Hello world");`,
+      _csrf: csrfToken,
+    });
+
+    groupedResponse = await agent
+      .get(`/pages/${latestPage.id}`)
+      .set("Accept", "application/json");
+    parsedGroupedResponse = JSON.parse(groupedResponse.text);
+    const { page } = parsedGroupedResponse;
+    expect(page.title).toBe("A program for printing Hello world");
+  });
+
   test("Delete Course", async () => {
     const agent = request.agent(server);
     await login(agent, "user.a@test.com", "12345678", "Instructor");
