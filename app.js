@@ -76,7 +76,6 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
-  console.log("Serializing user in session", user.id);
   done(null, user.id);
 });
 
@@ -543,34 +542,12 @@ app.post(
       const page = await Pages.findPage(request.params.id);
       const chapter = await page.getChapter();
       const course = await chapter.getCourse();
-      const pages = await chapter.getPages();
 
       const enrolled = await Enrollment.checkEnrollment(
         request.user.id,
         course.id,
       );
       await CompletedPages.markAsComplete(enrolled.id, request.params.id);
-
-      let x = 0;
-      for (const page of pages) {
-        if (!(await CompletedPages.checkComplete(enrolled.id, page.id))) {
-          break;
-        }
-        x++;
-      }
-
-      await Enrollment.update(
-        {
-          completed: x === pages.length,
-          progress: ((x / pages.length) * 100).toFixed(1),
-        },
-        {
-          where: {
-            studentId: request.user.id,
-            courseId: course.id,
-          },
-        },
-      );
 
       return response.json(true);
     } catch (error) {
@@ -665,10 +642,17 @@ app.get("/report", requireInstructor, async (request, response) => {
 });
 
 app.get("/progress", requireStudent, async (request, response) => {
-  const enrollments = await Enrollment.getEnrolledCourses(
+  let enrollments = await Enrollment.getEnrolledCourses(
     request.user.id,
     Course,
   );
+
+  for (const enrollment of enrollments) {
+    await Enrollment.calculateProgress(enrollment, CompletedPages);
+  }
+
+  enrollments = await Enrollment.getEnrolledCourses(request.user.id, Course);
+
   response.render("progress", {
     title: "Progress",
     enrollments,

@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
       return this.create({
         studentId,
         courseId,
-        progess: 0,
+        progress: 0,
       });
     }
 
@@ -65,6 +65,33 @@ module.exports = (sequelize, DataTypes) => {
         },
         include: Course,
       });
+    }
+
+    static async calculateProgress(enrollment, CompletedPages) {
+      const chapters = await enrollment.Course.getChapters();
+      let pages = [];
+      for (const chapter of chapters) {
+        pages = pages.concat(await chapter.getPages());
+      }
+
+      let x = 0;
+      for (const page of pages) {
+        if (await CompletedPages.checkComplete(enrollment.id, page.id)) {
+          x++;
+        }
+      }
+
+      return this.update(
+        {
+          completed: x === pages.length,
+          progress: ((x / pages.length) * 100).toFixed(1),
+        },
+        {
+          where: {
+            id: enrollment.id,
+          },
+        },
+      );
     }
 
     static unenroll(studentId, courseId) {
