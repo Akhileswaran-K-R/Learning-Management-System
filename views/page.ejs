@@ -43,7 +43,7 @@
       <h1 class="text-3xl font-bold"><%= chapter.title %></h1>
       <% if(isAuthor) { %>
         <div class="space-x-6 text-blue-600 font-semibold text-lg">
-          <a href="/courses/1/edit" class="hover:underline">Edit</a>
+          <a href="/chapters/<%= chapter.id %>/edit" class="hover:underline">Edit</a>
           <a href="#" onclick="deleteChapter(<%= chapter.id %>)" class="hover:underline">Delete</a>
         </div>
       <% } %>

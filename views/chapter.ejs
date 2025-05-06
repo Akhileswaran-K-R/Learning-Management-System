@@ -75,7 +75,7 @@
 
       <% if(isAuthor) { %>
         <div class="space-x-6 text-blue-600 font-semibold text-lg">
-          <a href="/courses/1/edit" class="hover:underline">Edit</a>
+          <a href="/courses/<%= course.id %>/edit" class="hover:underline">Edit</a>
           <a href="#" onclick="deleteCourse(<%= course.id %>)" class="hover:underline">Delete</a>
         </div>
       <% } else if(!isEnrolled && role !== 'Instructor') { %>

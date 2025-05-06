@@ -87,6 +87,12 @@ module.exports = (sequelize, DataTypes) => {
       return this.findByPk(id);
     }
 
+    editCourse(title) {
+      return this.update({
+        title,
+      });
+    }
+
     static deleteCourse(id) {
       return this.destroy({
         where: {

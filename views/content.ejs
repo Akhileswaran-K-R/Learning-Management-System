@@ -15,7 +15,6 @@
     <script>
       const token = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
       const chapterId = document.querySelector('meta[name="chapterId"]').getAttribute("content");
-      const pageIds = document.querySelector('meta[name="pageIds"]').getAttribute("content").split(',').map(Number);
 
       function markAsComplete(id){
         fetch(`/pages/${id}`,{
@@ -65,7 +64,7 @@
         <h1 class="text-4xl font-bold"><%= page.title %></h1>
         <% if(isAuthor) { %>
           <div class="space-x-6 text-blue-600 font-semibold text-lg">
-            <a href="/courses/1/edit" class="hover:underline">Edit</a>
+            <a href="/pages/<%= page.id %>/edit" class="hover:underline">Edit</a>
             <a href="#" onclick="deletePage(<%= page.id %>)" class="hover:underline">Delete</a>
           </div>
         <% } %>

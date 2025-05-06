@@ -350,6 +350,30 @@ app.post("/courses/new", requireInstructor, async (request, response) => {
   }
 });
 
+app.get("/courses/:id/edit", requireInstructor, async (request, response) => {
+  const course = await Course.findCourse(request.params.id);
+  response.render("editCourse", {
+    title: "Edit Course",
+    course,
+    csrfToken: request.csrfToken(),
+  });
+});
+
+app.post(
+  "/courses/:id/edit",
+  requireInstructor,
+  requireAuthor,
+  async (request, response) => {
+    try {
+      const course = await Course.findCourse(request.params.id);
+      await course.editCourse(request.body.title);
+      return response.redirect(`/courses/${request.params.id}/chapters`);
+    } catch (error) {
+      console.error(error);
+    }
+  },
+);
+
 app.get(
   "/courses/:id/chapters",
   connectEnsureLogin.ensureLoggedIn(),
@@ -489,6 +513,37 @@ app.get(
 );
 
 app.get(
+  "/chapters/:id/edit",
+  requireInstructor,
+  requireAuthor,
+  async (request, response) => {
+    const chapter = await Chapter.findChapter(request.params.id);
+    const course = await chapter.getCourse();
+    response.render("editChapter", {
+      title: "Edit Chapter",
+      course,
+      chapter,
+      csrfToken: request.csrfToken(),
+    });
+  },
+);
+
+app.post(
+  "/chapters/:id/edit",
+  requireInstructor,
+  requireAuthor,
+  async (request, response) => {
+    try {
+      const chapter = await Chapter.findChapter(request.params.id);
+      await chapter.editChapter(request.body.title, request.body.description);
+      return response.redirect(`/chapters/${chapter.id}/pages`);
+    } catch (error) {
+      console.error(error);
+    }
+  },
+);
+
+app.get(
   "/chapters/:id/pages/new",
   requireInstructor,
   requireAuthor,
@@ -583,6 +638,40 @@ app.post(
     } catch (error) {
       console.error(error);
       return response.status(422).json(false);
+    }
+  },
+);
+
+app.get(
+  "/pages/:id/edit",
+  requireInstructor,
+  requireAuthor,
+  async (request, response) => {
+    const page = await Pages.findPage(request.params.id);
+    const chapter = await page.getChapter();
+    const course = await chapter.getCourse();
+
+    response.render("editPage", {
+      title: "Edit Page",
+      course,
+      chapter,
+      page,
+      csrfToken: request.csrfToken(),
+    });
+  },
+);
+
+app.post(
+  "/pages/:id/edit",
+  requireInstructor,
+  requireAuthor,
+  async (request, response) => {
+    try {
+      const page = await Pages.findPage(request.params.id);
+      await page.editPage(request.body.title, request.body.content);
+      response.redirect(`/pages/${page.id}`);
+    } catch (error) {
+      console.error(error);
     }
   },
 );

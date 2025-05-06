@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/css/styles.css" rel="stylesheet">
+
+    <title><%= title %></title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+
+  <body class="bg-white min-h-screen font-[Comic_Sans_MS] px-24 py-16 leading-relaxed">
+    <%- include("breadcrumbs.ejs",{path: [`/courses/${course.id}/chapters`,course.title,`/chapters/${chapter.id}/pages`,chapter.title,`/pages/${page.id}`,page.title,"Edit Page"],isAuthor: true}) %>
+  
+    <h1 class="text-[3rem] font-bold mb-10">Edit Page</h1>
+  
+    <form method="POST" class="space-y-8">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+      <div>
+        <label for="title" class="block text-gray-700 mb-4">Title</label>
+        <input type="text" id="title" name="title" value="<%= page.title %>" class="w-[1000px] border px-4 py-2 rounded" required>
+      </div>
+
+      <div>
+        <label for="content" class="block text-gray-700 mb-4">Content</label>
+        <textarea id="content" name="content" rows="10" class="w-[1000px] border px-4 py-2 rounded" required><%= page.content %></textarea>
+      </div>
+
+      <div>
+        <button type="submit" class="bg-black text-white py-2 px-8 rounded hover:bg-gray-800 font-semibold">
+          Submit
+        </button>
+      </div>
+    </form>
+  </body>
+</html>
