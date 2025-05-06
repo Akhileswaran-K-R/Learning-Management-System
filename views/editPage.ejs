@@ -21,12 +21,12 @@
 
       <div>
         <label for="title" class="block text-gray-700 mb-4">Title</label>
-        <input type="text" id="title" name="title" value="<%= page.title %>" class="w-[1000px] border px-4 py-2 rounded" required>
+        <input type="text" id="title" name="title" value="<%= page.title %>" class="w-[1000px] border px-4 py-2 rounded">
       </div>
 
       <div>
         <label for="content" class="block text-gray-700 mb-4">Content</label>
-        <textarea id="content" name="content" rows="10" class="w-[1000px] border px-4 py-2 rounded" required><%= page.content %></textarea>
+        <textarea id="content" name="content" rows="10" class="w-[1000px] border px-4 py-2 rounded"><%= page.content %></textarea>
       </div>
 
       <div>
@@ -35,5 +35,7 @@
         </button>
       </div>
     </form>
+
+    <%- include('notification.ejs') %>
   </body>
 </html>

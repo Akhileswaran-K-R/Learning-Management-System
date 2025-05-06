@@ -21,12 +21,12 @@
 
       <div>
         <label for="title" class="block text-gray-700 mb-4">Title</label>
-        <input type="text" id="title" name="title" placeholder="Chapter name" class="w-[1000px] border px-4 py-2 rounded" required>
+        <input type="text" id="title" name="title" placeholder="Chapter name" class="w-[1000px] border px-4 py-2 rounded">
       </div>
 
       <div>
         <label for="description" class="block text-gray-700 mb-4">Description</label>
-        <textarea id="description" name="description" rows="7" placeholder="A brief description for the chapter" class="w-[1000px] border px-4 py-2 rounded" required></textarea>
+        <textarea id="description" name="description" rows="7" placeholder="A brief description for the chapter" class="w-[1000px] border px-4 py-2 rounded"></textarea>
       </div>
 
       <div>
@@ -36,5 +36,6 @@
       </div>
     </form>
 
+    <%- include('notification.ejs') %>
   </body>
 </html>

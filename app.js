@@ -221,7 +221,9 @@ app.post("/users", async (request, response) => {
       return response.redirect(`/home`);
     });
   } catch (error) {
-    console.error(error);
+    const msg = error.errors[0].message;
+    request.flash("error", msg);
+    return response.redirect("/signup");
   }
 });
 
@@ -346,7 +348,9 @@ app.post("/courses/new", requireInstructor, async (request, response) => {
 
     return response.redirect(`/courses/${newCourse.id}/chapters`);
   } catch (error) {
-    console.error(error);
+    const msg = error.errors[0].message;
+    request.flash("error", msg);
+    return response.redirect("/courses/new");
   }
 });
 
@@ -369,7 +373,9 @@ app.post(
       await course.editCourse(request.body.title);
       return response.redirect(`/courses/${request.params.id}/chapters`);
     } catch (error) {
-      console.error(error);
+      const msg = error.errors[0].message;
+      request.flash("error", msg);
+      return response.redirect(request.url);
     }
   },
 );
@@ -464,7 +470,9 @@ app.post(
       });
       return response.redirect(`/chapters/${newChapter.id}/pages`);
     } catch (error) {
-      console.error(error);
+      const msg = error.errors[0].message;
+      request.flash("error", msg);
+      return response.redirect(request.url);
     }
   },
 );
@@ -538,7 +546,9 @@ app.post(
       await chapter.editChapter(request.body.title, request.body.description);
       return response.redirect(`/chapters/${chapter.id}/pages`);
     } catch (error) {
-      console.error(error);
+      const msg = error.errors[0].message;
+      request.flash("error", msg);
+      return response.redirect(request.url);
     }
   },
 );
@@ -572,7 +582,9 @@ app.post(
       });
       return response.redirect(`/pages/${newPage.id}`);
     } catch (error) {
-      console.error(error);
+      const msg = error.errors[0].message;
+      request.flash("error", msg);
+      return response.redirect(request.url);
     }
   },
 );
@@ -671,7 +683,9 @@ app.post(
       await page.editPage(request.body.title, request.body.content);
       response.redirect(`/pages/${page.id}`);
     } catch (error) {
-      console.error(error);
+      const msg = error.errors[0].message;
+      request.flash("error", msg);
+      return response.redirect(request.url);
     }
   },
 );
