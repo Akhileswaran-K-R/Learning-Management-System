@@ -344,6 +344,7 @@ app.get(
       if (request.user.role === "Instructor") {
         courses = await instructor.getCourses({
           include: User,
+          order: [["createdAt", "ASC"]],
         });
       } else {
         courses = await Course.getEnrolledCourses(
@@ -625,6 +626,16 @@ app.post(
         content: request.body.content,
         chapterId: request.params.id,
       });
+
+      const chapter = await Chapter.findChapter(request.params.id);
+      const course = await chapter.getCourse();
+      const enrollments = await Enrollment.getEnrolledStudents(course.id);
+
+      for (const enrollment of enrollments) {
+        enrollment.Course = course;
+        await Enrollment.calculateProgress(enrollment, CompletedPages);
+      }
+
       return response.redirect(`/pages/${newPage.id}`);
     } catch (error) {
       const msg = error.errors[0].message;
@@ -693,8 +704,10 @@ app.post(
         request.user.id,
         course.id,
       );
-      await CompletedPages.markAsComplete(enrolled.id, request.params.id);
+      enrolled.Course = course;
 
+      await CompletedPages.markAsComplete(enrolled.id, request.params.id);
+      await Enrollment.calculateProgress(enrolled, CompletedPages);
       return response.json(true);
     } catch (error) {
       console.error(error);
@@ -761,7 +774,15 @@ app.delete(
   requireAuthor,
   async (request, response) => {
     try {
+      const chapter = await Chapter.findChapter(request.params.id);
+      const course = await chapter.getCourse();
+      const enrollments = await Enrollment.getEnrolledStudents(course.id);
       await Chapter.deleteChapter(request.params.id);
+
+      for (const enrollment of enrollments) {
+        enrollment.Course = course;
+        await Enrollment.calculateProgress(enrollment, CompletedPages);
+      }
       return response.json(true);
     } catch (error) {
       console.error(error);
@@ -776,7 +797,16 @@ app.delete(
   requireAuthor,
   async (request, response) => {
     try {
+      const page = await Pages.findPage(request.params.id);
+      const chapter = await page.getChapter();
+      const course = await chapter.getCourse();
+      const enrollments = await Enrollment.getEnrolledStudents(course.id);
       await Pages.deletePage(request.params.id);
+
+      for (const enrollment of enrollments) {
+        enrollment.Course = course;
+        await Enrollment.calculateProgress(enrollment, CompletedPages);
+      }
       return response.json(true);
     } catch (error) {
       console.error(error);
@@ -803,7 +833,9 @@ app.delete(
 app.get("/report", requireInstructor, async (request, response) => {
   try {
     const instructor = await User.findInstructor(request.user.id);
-    const courses = await instructor.getCourses();
+    const courses = await instructor.getCourses({
+      order: [["createdAt", "ASC"]],
+    });
     let totalCount = 0,
       totalCompleted = 0;
     for (const course of courses) {
@@ -829,12 +861,6 @@ app.get("/progress", requireStudent, async (request, response) => {
     request.user.id,
     Course,
   );
-
-  for (const enrollment of enrollments) {
-    await Enrollment.calculateProgress(enrollment, CompletedPages);
-  }
-
-  enrollments = await Enrollment.getEnrolledCourses(request.user.id, Course);
 
   response.render("progress", {
     title: "Progress",

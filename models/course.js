@@ -29,6 +29,7 @@ module.exports = (sequelize, DataTypes) => {
             [Op.ne]: excludedId,
           },
         },
+        order: [["createdAt", "ASC"]],
       });
     }
 
@@ -38,6 +39,7 @@ module.exports = (sequelize, DataTypes) => {
           studentId: targetStudentId,
         },
         attributes: ["courseId"],
+        order: [["createdAt", "ASC"]],
       });
 
       const enrolledCourseIds = enrolledCourses.map(
@@ -60,6 +62,7 @@ module.exports = (sequelize, DataTypes) => {
           studentId: targetStudentId,
         },
         attributes: ["courseId"],
+        order: [["createdAt", "ASC"]],
       });
 
       const enrolledCourseIds = enrolledCourses.map(

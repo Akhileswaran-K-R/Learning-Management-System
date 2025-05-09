@@ -59,11 +59,20 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     static getEnrolledCourses(studentId, Course) {
-      return Enrollment.findAll({
+      return this.findAll({
         where: {
           studentId,
         },
         include: Course,
+        order: [["createdAt", "ASC"]],
+      });
+    }
+
+    static getEnrolledStudents(courseId) {
+      return this.findAll({
+        where: {
+          courseId,
+        },
       });
     }
 
