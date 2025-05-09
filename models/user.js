@@ -30,6 +30,19 @@ module.exports = (sequelize, DataTypes) => {
     static findInstructor(id) {
       return this.findByPk(id);
     }
+
+    static updatePassword(id, hashedPwd) {
+      return User.update(
+        {
+          password: hashedPwd,
+        },
+        {
+          where: {
+            id,
+          },
+        },
+      );
+    }
   }
   User.init(
     {

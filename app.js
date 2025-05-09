@@ -178,10 +178,10 @@ app.get("/", (request, response) => {
   }
 });
 
-app.get("/signup", (request, response) => {
+app.get("/signup/:role", (request, response) => {
   response.render("signup", {
     title: "Sign up",
-    role: request.query.role,
+    role: request.params.role,
     csrfToken: request.csrfToken(),
   });
 });
@@ -195,10 +195,10 @@ app.get("/signout", (request, response, next) => {
   });
 });
 
-app.get("/login", (request, response) => {
+app.get("/login/:role", (request, response) => {
   response.render("login", {
     title: "Login",
-    role: request.query.role,
+    role: request.params.role,
     csrfToken: request.csrfToken(),
   });
 });
@@ -229,10 +229,13 @@ app.post("/users", async (request, response) => {
 
 app.post(
   "/session",
-  passport.authenticate("local", {
-    failureRedirect: "/",
-    failureFlash: true,
-  }),
+  (request, response, next) => {
+    const callback = passport.authenticate("local", {
+      failureRedirect: `/login/${request.body.role}`,
+      failureFlash: true,
+    });
+    return callback(request, response, next);
+  },
   (request, response) => {
     if (request.body.role === request.user.role) {
       return response.redirect(`/home`);
@@ -268,16 +271,7 @@ app.post(
     if (result) {
       const hashedPwd = await bcrypt.hash(request.body.newPassword, saltRounds);
       try {
-        await User.update(
-          {
-            password: hashedPwd,
-          },
-          {
-            where: {
-              id: request.user.id,
-            },
-          },
-        );
+        await User.updatePassword(request.user.id, hashedPwd);
         request.logout((err) => {
           if (err) {
             return next(err);
@@ -455,7 +449,7 @@ app.get(
             }
           }
 
-          if (x === pages.length) {
+          if (x === pages.length && pages.length != 0) {
             chapter.complete = true;
           } else {
             chapter.complete = false;
