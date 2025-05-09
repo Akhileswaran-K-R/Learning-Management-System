@@ -83,7 +83,7 @@ module.exports = (sequelize, DataTypes) => {
 
       return this.update(
         {
-          completed: x === pages.length,
+          completed: x === pages.length && pages.length != 0,
           progress:
             pages.length === 0 ? 0 : ((x / pages.length) * 100).toFixed(1),
         },

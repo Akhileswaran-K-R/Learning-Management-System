@@ -17,13 +17,14 @@ A lightweight Learning Management System built with **Node.js**, **Express**, **
 
 ## 📸 Screenshots
 
-### Student View – Course Page  
+![Student Home Page](./assets/screenshots/student-home.png)
+
 ![Student Course Page](./assets/screenshots/student-course.png)
 
-### Page View with Progress  
-![Page View](./assets/screenshots/page-view.png)
+![Student Page View](./assets/screenshots/student-page-view.png)
 
-### Admin Report  
+![Progess Report](./assets/screenshots/progress-report.png)
+
 ![Admin Report](./assets/screenshots/admin-report.png)
 
 ---
@@ -41,7 +42,7 @@ A lightweight Learning Management System built with **Node.js**, **Express**, **
 
 Try the app live here:  
 👉 []()  
-(*Feel free to sign up and explore!*)
+(_Feel free to sign up and explore!_)
 
 ---
 
@@ -49,6 +50,6 @@ Try the app live here:
 
 Watch a short demo of how the LMS works and how you can use it:  
 📺 []()  
-(*Covers registration, course creation, navigating pages, and progress tracking.*)
+(_Covers registration, course creation, navigating pages, and progress tracking._)
 
 ---
