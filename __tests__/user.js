@@ -54,7 +54,7 @@ async function addPage(agent, id) {
 }
 
 const login = async (agent, username, password, role) => {
-  let res = await agent.get("/login");
+  let res = await agent.get(`/login/${role}`);
   let csrfToken = extractCsrfToken(res);
   res = await agent.post("/session").send({
     email: username,
@@ -69,8 +69,15 @@ describe("User test suite", () => {
     await db.sequelize.sync({ force: true });
     server = app.listen(4000);
     agent = request.agent(server);
+  });
 
-    let res = await agent.get("/signup");
+  afterAll(async () => {
+    await db.sequelize.close();
+    server.close();
+  });
+
+  test("Sign up for instructor", async () => {
+    let res = await agent.get("/signup/Instructor");
     let csrfToken = extractCsrfToken(res);
     res = await agent.post("/users").send({
       firstName: "Test",
@@ -80,9 +87,12 @@ describe("User test suite", () => {
       role: "Instructor",
       _csrf: csrfToken,
     });
+    expect(res.statusCode).toBe(302);
+  });
 
-    res = await agent.get("/signup");
-    csrfToken = extractCsrfToken(res);
+  test("Sign up for student", async () => {
+    let res = await agent.get("/signup/Student");
+    let csrfToken = extractCsrfToken(res);
     res = await agent.post("/users").send({
       firstName: "Test",
       lastName: "User B",
@@ -91,11 +101,7 @@ describe("User test suite", () => {
       role: "Student",
       _csrf: csrfToken,
     });
-  });
-
-  afterAll(async () => {
-    await db.sequelize.close();
-    server.close();
+    expect(res.statusCode).toBe(302);
   });
 
   test("Sign out", async () => {
