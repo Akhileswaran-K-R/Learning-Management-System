@@ -652,7 +652,9 @@ app.get(
   async (request, response) => {
     const page = await Pages.findPage(request.params.id);
     const chapter = await page.getChapter();
-    let pages = await chapter.getPages();
+    let pages = await chapter.getPages({
+      order: [["createdAt", "ASC"]],
+    });
     const course = await chapter.getCourse();
     const isAuthor = request.user.id === (await course.getUser()).id ? 1 : 0;
     const isEnrolled = await Enrollment.checkEnrollment(
