@@ -60,7 +60,7 @@
         <div class="space-y-3">
           <% pages.forEach((page) => { %>
             <a href = "/pages/<%= page.id %>" class="block">
-              <div class="flex justify-between items-center border px-4 py-2 rounded shadow w-140 ">
+              <div class="bg-white flex justify-between items-center border px-4 py-2 rounded shadow w-140 ">
                 <span><%= page.title %></span>
                 <% if(page.complete) { %>
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">

@@ -55,10 +55,10 @@
   </head>
 
 
-  <body class="bg-white min-h-screen font-[Comic_Sans_MS] px-24 py-16 leading-relaxed">
+  <body class="bg-gray-100 min-h-screen font-[Comic_Sans_MS] px-24 py-16 leading-relaxed">
     <%- include('breadcrumbs.ejs',{path: [`/courses/${course.id}/chapters`,course.title,`/chapters/${chapter.id}/pages`,chapter.title,page.title]}) %>
 
-    <div class="p-12 max-w-5xl mx-auto border ">
+    <div class="bg-white p-12 max-w-5xl mx-auto border ">
 
       <div class="flex justify-between items-center mb-8">
         <h1 class="text-4xl font-bold"><%= page.title %></h1>

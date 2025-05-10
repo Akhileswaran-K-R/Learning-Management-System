@@ -13,9 +13,11 @@
             <%= courses[i].count %>
           </p>
           <div class="flex space-x-2">
-            <button class="bg-cyan-600 text-white px-2 py-1 rounded text-sm">
-              <a href="/courses/<%= courses[i].id %>/chapters">View course</a>
-            </button>
+            <a href="/courses/<%= courses[i].id %>/chapters">
+              <button class="bg-cyan-600 text-white px-2 py-1 rounded text-sm">
+                View course
+              </button>
+            </a>
 
             <% if(role ===  "Student" && !isEnrolled) { %>
               <button class="bg-green-500 text-white px-2 py-1 rounded text-sm" onclick="enroll(<%= courses[i].id %>)">Enroll</button>
