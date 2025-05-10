@@ -67,9 +67,11 @@
         <% } %>
   
         <% if(isAuthor) { %>
-          <button class="px-6 py-3 bg-purple-600 text-white font-bold text-lg rounded mt-8">
-            <a href="/courses/<%= course.id %>/chapters/new">Create a new chapter</a>
-          </button>
+          <a href="/courses/<%= course.id %>/chapters/new">
+            <button class="px-6 py-3 bg-purple-600 text-white font-bold text-lg rounded mt-8">
+              Create a new chapter
+            </button>
+          </a>
         <% } %>
       </div>
 
