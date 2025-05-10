@@ -31,7 +31,13 @@
               <td class="py-4 font-medium"><%= course.title %></td>
               <td class="py-4"><%= course.count %></td>
               <td class="py-4"><%= course.completed %></td>
-              <td class="py-4"><%= ((course.completed / course.count) * 100).toFixed(1) %>%</td>
+              <td class="py-4">
+                <% if(course.count === 0 ) { %>
+                  0.0%
+                <% } else {%>
+                  <%= ((course.completed / course.count) * 100).toFixed(1) %>%
+                <% } %>
+              </td>
             </tr>
           <% }) %>
 

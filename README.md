@@ -49,7 +49,7 @@ Try the app live here:
 # 🎥 Screencast Walkthrough
 
 Watch a short demo of how the LMS works and how you can use it:  
-📺 []()  
+📺 [LMS Walkthrough](https://drive.google.com/file/d/1ErV6Yiavu5nwKlrAaMWEP3RN6flQuGGC/view?usp=sharing)  
 (_Covers registration, course creation, navigating pages, and progress tracking._)
 
 ---
