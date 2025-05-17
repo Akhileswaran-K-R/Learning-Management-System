@@ -72,10 +72,14 @@ passport.use(
             if (result) {
               return done(null, user);
             } else {
-              return done(null, false, { message: "Invalid password" });
+              return done(null, false, {
+                message: "Login failed; Invalid user ID or password.",
+              });
             }
           } else {
-            return done(null, false, { message: "Invalid username" });
+            return done(null, false, {
+              message: "Login failed; Invalid user ID or password.",
+            });
           }
         })
         .catch((error) => {
