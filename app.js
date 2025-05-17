@@ -38,6 +38,8 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(
   session({
     secret: "my-super-secret-key-21728172615261562",
+    resave: false,
+    saveUninitialized: false,
     cookie: {
       maxAge: 24 * 60 * 60 * 1000, //24hrs
     },
@@ -223,7 +225,7 @@ app.post("/users", async (request, response) => {
   } catch (error) {
     const msg = error.errors[0].message;
     request.flash("error", msg);
-    return response.redirect("/signup");
+    return response.redirect(`/signup/${request.body.role}`);
   }
 });
 
@@ -252,16 +254,20 @@ app.post(
   },
 );
 
-app.get("/update", connectEnsureLogin.ensureLoggedIn(), (request, response) => {
-  response.render("updatePassword", {
-    title: "Update password",
-    csrfToken: request.csrfToken(),
-  });
-});
+app.get(
+  "/update",
+  connectEnsureLogin.ensureLoggedIn({ redirectTo: "/", setReturnTo: false }),
+  (request, response) => {
+    response.render("updatePassword", {
+      title: "Update password",
+      csrfToken: request.csrfToken(),
+    });
+  },
+);
 
 app.post(
   "/update",
-  connectEnsureLogin.ensureLoggedIn(),
+  connectEnsureLogin.ensureLoggedIn({ redirectTo: "/", setReturnTo: false }),
   async (request, response) => {
     const result = await bcrypt.compare(
       request.body.oldPassword,
@@ -292,7 +298,7 @@ app.post(
 
 app.get(
   "/home",
-  connectEnsureLogin.ensureLoggedIn(),
+  connectEnsureLogin.ensureLoggedIn({ redirectTo: "/", setReturnTo: false }),
   async (request, response) => {
     try {
       let courses;
@@ -335,7 +341,7 @@ app.get(
 
 app.get(
   "/courses",
-  connectEnsureLogin.ensureLoggedIn(),
+  connectEnsureLogin.ensureLoggedIn({ redirectTo: "/", setReturnTo: false }),
   async (request, response) => {
     try {
       const instructor = await User.findInstructor(request.user.id);
@@ -424,7 +430,7 @@ app.post(
 
 app.get(
   "/courses/:id/chapters",
-  connectEnsureLogin.ensureLoggedIn(),
+  connectEnsureLogin.ensureLoggedIn({ redirectTo: "/", setReturnTo: false }),
   async (request, response) => {
     try {
       const course = await Course.findCourse(request.params.id);
@@ -523,7 +529,7 @@ app.post(
 
 app.get(
   "/chapters/:id/pages",
-  connectEnsureLogin.ensureLoggedIn(),
+  connectEnsureLogin.ensureLoggedIn({ redirectTo: "/", setReturnTo: false }),
   requireEnrolled,
   async (request, response) => {
     try {
@@ -647,7 +653,7 @@ app.post(
 
 app.get(
   "/pages/:id",
-  connectEnsureLogin.ensureLoggedIn(),
+  connectEnsureLogin.ensureLoggedIn({ redirectTo: "/", setReturnTo: false }),
   requireEnrolled,
   async (request, response) => {
     const page = await Pages.findPage(request.params.id);
